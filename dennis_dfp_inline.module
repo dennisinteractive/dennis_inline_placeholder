@@ -5,6 +5,70 @@
  */
 
 /**
+ * Implements hook_context_registry().
+ */
+function dennis_dfp_inline_context_registry() {
+  return array(
+    'reactions' => array(
+      'dennis_dfp_inline' => array(
+        'title' => t('DFP Inline Tag'),
+        'plugin' => 'dennis_dfp_inline',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_context_plugins().
+ */
+function dennis_dfp_inline_context_plugins() {
+  $plugins = array();
+  $plugins['dennis_dfp_inline'] = array(
+    'handler' => array(
+      'path' => drupal_get_path('module', 'dennis_dfp_inline') . '/plugins',
+      'file' => 'dennis_dfp_inline_context_reaction_add.inc',
+      'class' => 'dennis_dfp_inline_context_reaction_add',
+      'parent' => 'context_reaction',
+    ),
+  );
+
+  return $plugins;
+}
+
+/**
+ * Implements of hook_page_build().
+ */
+function dennis_dfp_inline_page_build(&$page) {
+  if (module_exists('context') && $plugin = context_get_plugin('reaction', 'dennis_dfp_inline')) {
+    $plugin->execute();
+
+    if (isset($plugin->inline_tags) && !empty($plugin->inline_tags)) {
+      $inline_tag_config = array();
+
+      foreach ($plugin->inline_tags as $key => $machine_name) {
+        $tag_render = dfp_tag($machine_name);
+        if (!empty($tag_render) && empty($tag_render['dfp_wrapper']['tag']['#tag']->disabled)) {
+          $tag = $tag_render['dfp_wrapper']['tag']['#tag'];
+          // Prepare some configuration for the JavaScript.
+          $inline_tag_config[$machine_name] = array(
+            'float' => $tag->settings['inline']['float'],
+            'margin' => $tag->settings['inline']['margin'],
+            'classes' => $tag->settings['inline']['classes'],
+          );
+          // This triggers the necessary Google Publisher Tag code in <head>.
+          render($tag_render);
+        }
+      }
+
+      // Add any collected JS configuration.
+      if (!empty($inline_tag_config)) {
+        drupal_add_js(array('dennisDfpInline' => array('tags' => $inline_tag_config)), 'setting');
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  *
  * Extend DFP tag settings with inline configuration.

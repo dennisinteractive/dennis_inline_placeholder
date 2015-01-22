@@ -1,3 +1,5 @@
 name = Dennis DFP Inline
 description = Injects ads inline into the body field of a node.
 core = 7.x
+
+dependencies[] = dfp
