@@ -1,0 +1,81 @@
+<?php
+/**
+ * @file
+ * dennis_dfp_inline.module
+ */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Extend DFP tag settings with inline configuration.
+ */
+function dennis_dfp_inline_form_ctools_export_ui_edit_item_form_alter(&$form, &$form_state) {
+  if ($form_state['plugin']['schema'] == 'dfp_tags') {
+
+    // Create a default tag object.
+    $tag = ($form_state['op'] == 'add' ? $form_state['item'] : $form_state['item']->raw);
+
+    $form['tag_display_options']['use'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Inline ad'),
+      '#description' => t('Render this slot inline in the body of content pages. Please note that an ad slot cannot be configured both as block and inline to avoid ad slot duplication.'),
+      '#default_value' => isset($tag->settings['inline']['use']) ? $tag->settings['inline']['use'] : FALSE,
+      '#parents' => array('settings', 'inline', 'use'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name="settings[short_tag]"]' => array('checked' => FALSE),
+        ),
+        'enabled' => array(
+          ':input[name="block"]' => array('checked' => FALSE),
+        ),
+        'checked' => array(
+          ':input[name="block"]' => array('checked' => FALSE),
+          ':input[name="settings[short_tag]"]' => array('checked' => FALSE),
+        ),
+      ),
+    );
+
+    $form['tag_display_options']['inline'] = array(
+      '#type' => 'fieldset',
+      '#description' => t('Options for inline rendering'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name="settings[inline][use]"]' => array('checked' => TRUE),
+          ':input[name="settings[short_tag]"]' => array('checked' => FALSE),
+          ':input[name="block"]' => array('checked' => FALSE),
+        ),
+      ),
+    );
+
+    $form['tag_display_options']['inline']['float'] = array(
+      '#type' => 'select',
+      '#title' => t('Float'),
+      '#description' => t('Select ad container floating.'),
+      '#default_value' => isset($tag->settings['inline']['float']) ? $tag->settings['inline']['float'] : '',
+      '#options' => array(
+        '' => t('None'),
+        'left' => t('Left'),
+        'right' => t('Right'),
+      ),
+      '#parents' => array('settings', 'inline', 'float'),
+    );
+
+    $form['tag_display_options']['inline']['margin'] = array(
+      '#type' => 'textfield',
+      '#title' => t('CSS margin'),
+      '#description' => t('Add CSS margin values'),
+      '#size' => 20,
+      '#field_suffix' => 'px',
+      '#default_value' => isset($tag->settings['inline']['margin']) ? $tag->settings['inline']['margin'] : '',
+      '#parents' => array('settings', 'inline', 'margin'),
+    );
+
+    $form['tag_display_options']['inline']['classes'] = array(
+      '#type' => 'textfield',
+      '#title' => t('CSS classes'),
+      '#description' => t('If rendered inline, add optional CSS class names to the wrapper element of the ad slot.'),
+      '#default_value' => isset($tag->settings['inline']['classes']) ? $tag->settings['inline']['classes'] : '',
+      '#parents' => array('settings', 'inline', 'classes'),
+    );
+  }
+}
