@@ -60,12 +60,51 @@ function dennis_dfp_inline_page_build(&$page) {
         }
       }
 
-      // Add any collected JS configuration.
       if (!empty($inline_tag_config)) {
+        // Add any collected JS configuration.
         drupal_add_js(array('dennisDfpInline' => array('tags' => $inline_tag_config)), 'setting');
+        // Load the JS app.
+        _dennis_dfp_inline_load_js();
       }
     }
   }
+}
+
+/**
+ * Load the JS application via require
+ */
+function _dennis_dfp_inline_load_js() {
+  $js_devel = variable_get('dennis_js_devel', FALSE);
+  $subfolder = ($js_devel) ? 'src' : 'dist';
+  $path = drupal_get_path('module', 'dennis_dfp_inline') . '/js/' . $subfolder;
+  $options = array(
+    'returns' => 'app',
+    'init' => 'app.init();',
+    'group' => DENNIS_JS_INLINE,
+    'environment' => DENNIS_JS_ENV_ALL,
+  );
+
+  // Add the application path prefix - development mode as default.
+  dennis_js_add_js('dfpinline', array(
+    'path' => $path,
+  ));
+
+  // Production mode extras.
+  if (!$js_devel) {
+    // Production mode needs the full path.
+    $options += array(
+      'path' => $path . '/dfpinline/app',
+    );
+    // Add bundle config.
+    dennis_js_add_js(array(
+      'bundles' => array(
+        'dfpinline/app' => array('domReady', 'has'),
+      ),
+    ), 'config');
+  }
+
+  // Init the app itself, this in both dev and production.
+  dennis_js_add_js('dfpinline/app', $options);
 }
 
 /**
