@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Context reaction plugin for DFP Inline rendering.
@@ -46,8 +45,7 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
   }
 
   /**
-   * Check each currently set context to see if the DFP tag specified by
-   * machinename should be added to the page or not.
+   * Check each currently set context for DFP ad slot machine names.
    */
   function execute() {
     foreach ($this->get_contexts() as $context_name => $context) {

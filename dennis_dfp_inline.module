@@ -40,7 +40,7 @@ function dennis_dfp_inline_context_plugins() {
 }
 
 /**
- * Implements of hook_page_build().
+ * Implements hook_page_build().
  */
 function dennis_dfp_inline_page_build(&$page) {
   if (module_exists('context') && $plugin = context_get_plugin('reaction', 'dennis_dfp_inline')) {
@@ -55,9 +55,12 @@ function dennis_dfp_inline_page_build(&$page) {
 /**
  * Add slot definitions and bootstrap data for Javascript.
  *
- * @param  $tags  An array of ad tags to prepare for display
- * @return        An array of ad slots with keys as machine name and individual
- *   slot settings for each slot.
+ * @param array $tags
+ *   An array of ad tags to prepare for display
+ *
+ * @return array
+ *   An array of ad slots with keys as machine name and individual slot settings
+ *   for each slot.
  */
 function dfp_inline_tags($tags = array()) {
   if (!$tags) {
@@ -110,7 +113,7 @@ function dfp_inline_tags($tags = array()) {
 }
 
 /**
- * Load the JS application via require
+ * Load the JS application via require.
  */
 function _dennis_dfp_inline_load_js() {
   $js_devel = variable_get('dennis_js_devel', FALSE);
