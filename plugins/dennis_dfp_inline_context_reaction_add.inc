@@ -4,6 +4,7 @@
  * Context reaction plugin for DFP Inline rendering.
  */
 
+// @codingStandardsIgnoreStart
 /**
  * Expose DFP Inline Tags as context reactions.
  */
@@ -60,3 +61,4 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
     }
   }
 }
+// @codingStandardsIgnoreEnd
