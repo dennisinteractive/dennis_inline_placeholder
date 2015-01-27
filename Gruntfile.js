@@ -79,7 +79,7 @@ module.exports = function(grunt) {
 
     bytesize: {
       dist: {
-        src: ['js/dist/*.js', 'css/*.css']
+        src: ['js/dist/<%= meta.dist.dirname %>/<%= meta.dist.outfile %>*.js']
       }
     },
 
