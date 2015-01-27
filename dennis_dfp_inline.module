@@ -47,41 +47,66 @@ function dennis_dfp_inline_page_build(&$page) {
     $plugin->execute();
 
     if (isset($plugin->inline_tags) && !empty($plugin->inline_tags)) {
-      $inline_tag_data = array();
-
-      foreach ($plugin->inline_tags as $key => $machine_name) {
-        $tag_render = dfp_tag($machine_name);
-        if (!empty($tag_render) && empty($tag_render['dfp_wrapper']['tag']['#tag']->disabled)) {
-          $tag = $tag_render['dfp_wrapper']['tag']['#tag'];
-          // Prepare some configuration for the JavaScript.
-          $inline_tag_data[$machine_name] = array(
-            'float' => $tag->settings['inline']['float'],
-            'margin' => $tag->settings['inline']['margin'],
-            'classes' => $tag->settings['inline']['classes'],
-          );
-          // This triggers the necessary Google Publisher Tag code in <head>.
-          render($tag_render);
-        }
-      }
-
-      if (!empty($inline_tag_data)) {
-        $config = array(
-          'firstPosition' => variable_get('dennis_dfp_inline_first_position', DENNIS_DFP_INLINE_FIRST_POSITION),
-          'minDistance' => variable_get('dennis_dfp_inline_min_distance', DENNIS_DFP_INLINE_MIN_DISTANCE),
-          'minParaLength' => variable_get('dennis_dfp_inline_paragraph_length', DENNIS_DFP_INLINE_PARAGRAPH_LENGTH),
-        );
-        // Add any collected JS configuration.
-        drupal_add_js(array(
-          'dennisDfpInline' => array(
-            'tags' => $inline_tag_data,
-            'config' => $config,
-          ),
-        ), 'setting');
-        // Load the JS app.
-        _dennis_dfp_inline_load_js();
-      }
+      dfp_inline_tags($plugin->inline_tags);
     }
   }
+}
+
+/**
+ * Add slot definitions and bootstrap data for Javascript.
+ *
+ * @param  $tags  An array of ad tags to prepare for display
+ * @return        An array of ad slots with keys as machine name and individual
+ *   slot settings for each slot.
+ */
+function dfp_inline_tags($tags = array()) {
+  if (!$tags) {
+    return FALSE;
+  }
+
+  $inline_tag_data = array();
+
+  foreach ($tags as $machine_name) {
+    $tag_render = dfp_tag($machine_name);
+    if (!empty($tag_render) && empty($tag_render['dfp_wrapper']['tag']['#tag']->disabled)) {
+      $tag = $tag_render['dfp_wrapper']['tag']['#tag'];
+
+      // Check if tag is an inline tag once more. Although the context reaction
+      // can only be configured with inline tags, this function could be called
+      // directly from elsewhere.
+      if (!isset($tag->settings['inline']) || !isset($tag->settings['inline']['use']) || $tag->settings['inline']['use'] !== 1) {
+        watchdog('dennis_dfp_inline', 'Ad tag %machinename passed to dfp_inline_tags() but not configured as an inline tag.', array('%machinename' => $machinename), WATCHDOG_WARNING);
+        continue;
+      }
+
+      // Prepare some configuration for the JavaScript.
+      unset($tag->settings['inline']['use']);
+      $inline_tag_data[$machine_name] = $tag->settings['inline'];
+      // This triggers the necessary Google Publisher Tag code in <head>.
+      render($tag_render);
+    }
+  }
+
+  if (empty($inline_tag_data)) {
+    return FALSE;
+  }
+
+  $config = array(
+    'firstPosition' => variable_get('dennis_dfp_inline_first_position', DENNIS_DFP_INLINE_FIRST_POSITION),
+    'minDistance' => variable_get('dennis_dfp_inline_min_distance', DENNIS_DFP_INLINE_MIN_DISTANCE),
+    'minParaLength' => variable_get('dennis_dfp_inline_paragraph_length', DENNIS_DFP_INLINE_PARAGRAPH_LENGTH),
+  );
+  // Add any collected JS configuration.
+  drupal_add_js(array(
+    'dennisDfpInline' => array(
+      'config' => $config,
+      'tags' => $inline_tag_data,
+    ),
+  ), 'setting');
+  // Load the JS app.
+  _dennis_dfp_inline_load_js();
+
+  return $inline_tag_data;
 }
 
 /**
