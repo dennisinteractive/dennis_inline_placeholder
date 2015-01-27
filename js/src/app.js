@@ -1,17 +1,12 @@
 define([
+  'dfpinline/slotrender',
   'domReady!',
   'has',
-], function() {
-
-  var app = {};
-
-  app.init = function() {
-    console.log('I am a skeleton');
-  };
+], function(slotrender) {
 
   return {
     init: function() {
-      return app.init();
+      return slotrender.init();
     }
   };
 });
