@@ -4,6 +4,10 @@
  * dennis_dfp_inline.module
  */
 
+define("DENNIS_DFP_INLINE_FIRST_POSITION", 1);
+define("DENNIS_DFP_INLINE_MIN_DISTANCE", 3);
+define("DENNIS_DFP_INLINE_PARAGRAPH_LENGTH", 100);
+
 /**
  * Implements hook_context_registry().
  */
@@ -43,14 +47,14 @@ function dennis_dfp_inline_page_build(&$page) {
     $plugin->execute();
 
     if (isset($plugin->inline_tags) && !empty($plugin->inline_tags)) {
-      $inline_tag_config = array();
+      $inline_tag_data = array();
 
       foreach ($plugin->inline_tags as $key => $machine_name) {
         $tag_render = dfp_tag($machine_name);
         if (!empty($tag_render) && empty($tag_render['dfp_wrapper']['tag']['#tag']->disabled)) {
           $tag = $tag_render['dfp_wrapper']['tag']['#tag'];
           // Prepare some configuration for the JavaScript.
-          $inline_tag_config[$machine_name] = array(
+          $inline_tag_data[$machine_name] = array(
             'float' => $tag->settings['inline']['float'],
             'margin' => $tag->settings['inline']['margin'],
             'classes' => $tag->settings['inline']['classes'],
@@ -60,9 +64,19 @@ function dennis_dfp_inline_page_build(&$page) {
         }
       }
 
-      if (!empty($inline_tag_config)) {
+      if (!empty($inline_tag_data)) {
+        $config = array(
+          'firstPosition' => variable_get('dennis_dfp_inline_first_position', DENNIS_DFP_INLINE_FIRST_POSITION),
+          'minDistance' => variable_get('dennis_dfp_inline_min_distance', DENNIS_DFP_INLINE_MIN_DISTANCE),
+          'minParaLength' => variable_get('dennis_dfp_inline_paragraph_length', DENNIS_DFP_INLINE_PARAGRAPH_LENGTH),
+        );
         // Add any collected JS configuration.
-        drupal_add_js(array('dennisDfpInline' => array('tags' => $inline_tag_config)), 'setting');
+        drupal_add_js(array(
+          'dennisDfpInline' => array(
+            'tags' => $inline_tag_data,
+            'config' => $config,
+          ),
+        ), 'setting');
         // Load the JS app.
         _dennis_dfp_inline_load_js();
       }
