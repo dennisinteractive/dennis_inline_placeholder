@@ -84,7 +84,8 @@ function dfp_inline_tags($tags = array()) {
 
       // Prepare some configuration for the JavaScript.
       unset($tag->settings['inline']['use']);
-      $inline_tag_data[$machine_name] = $tag->settings['inline'];
+      // $inline_tag_data[$machine_name] = $tag->settings['inline'];
+      $inline_tag_data[] = array($machine_name, $tag->settings['inline']);
       // This triggers the necessary Google Publisher Tag code in <head>.
       render($tag_render);
     }
