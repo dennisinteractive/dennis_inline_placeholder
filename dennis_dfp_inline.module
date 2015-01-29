@@ -4,6 +4,8 @@
  * dennis_dfp_inline.module
  */
 
+define("DENNIS_DFP_INLINE_SELECTOR", '.node-full > .content > .field-name-body');
+define("DENNIS_DFP_INLINE_PLACEHOLDER", '<!--#dfpinline#-->');
 define("DENNIS_DFP_INLINE_FIRST_POSITION", 2);
 define("DENNIS_DFP_INLINE_MIN_DISTANCE", 3);
 define("DENNIS_DFP_INLINE_PARAGRAPH_LENGTH", 100);
@@ -96,6 +98,8 @@ function dfp_inline_tags($tags = array()) {
   }
 
   $config = array(
+    'selector' => variable_get('dennis_dfp_inline_selector', DENNIS_DFP_INLINE_SELECTOR),
+    'placeholder' => variable_get('dennis_dfp_inline_placeholder', DENNIS_DFP_INLINE_PLACEHOLDER),
     'firstPosition' => variable_get('dennis_dfp_inline_first_position', DENNIS_DFP_INLINE_FIRST_POSITION),
     'minDistance' => variable_get('dennis_dfp_inline_min_distance', DENNIS_DFP_INLINE_MIN_DISTANCE),
     'minParaLength' => variable_get('dennis_dfp_inline_paragraph_length', DENNIS_DFP_INLINE_PARAGRAPH_LENGTH),
@@ -201,4 +205,60 @@ function dennis_dfp_inline_form_ctools_export_ui_edit_item_form_alter(&$form, &$
       '#parents' => array('settings', 'inline', 'classes'),
     );
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Extend Global settings form with inline configuration.
+ */
+function dennis_dfp_inline_form_dfp_admin_settings_alter(&$form, &$form_state) {
+
+  $form['global_inline_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Global Inline Settings'),
+    '#description' => t('The following settings control the automated placement of inline ad slots.'),
+    '#group' => 'settings',
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#attached' => array(
+      'js' => array(
+        'vertical-tabs' => drupal_get_path('module', 'dennis_dfp_inline') . '/js/admin/dennis_dfp_inline.admin.js',
+      ),
+    ),
+  );
+  $form['global_inline_settings']['dennis_dfp_inline_selector'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Field content selector'),
+    '#default_value' => variable_get('dennis_dfp_inline_selector', DENNIS_DFP_INLINE_SELECTOR),
+    '#description' => t('The DOM selector which translates to a single element with children as paragraphs or other blocks (media images, headings, etc.). This will be used for analysis and the placement of inline ad slots.'),
+  );
+  $form['global_inline_settings']['dennis_dfp_inline_placeholder'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Inline ad placeholder'),
+    '#default_value' => variable_get('dennis_dfp_inline_placeholder', DENNIS_DFP_INLINE_PLACEHOLDER),
+    '#description' => t('The pattern to use for manually inserted inline ad slot placeholders.'),
+  );
+  $form['global_inline_settings']['dennis_dfp_inline_first_position'] = array(
+    '#type' => 'select',
+    '#title' => t('Refresh ads on every nth slide change'),
+    '#options' => array(
+      1 => t('first'),
+      2 => t('second'),
+      3 => t('third'),
+      4 => t('fourth'),
+      5 => t('fifth'),
+    ),
+    '#field_prefix' => 'Before the',
+    '#field_suffix' => 'paragraph or other block level element (media file, etc.)',
+    '#default_value' => variable_get('dennis_dfp_inline_first_position', DENNIS_DFP_INLINE_FIRST_POSITION),
+    '#description' => t('The first ad slot should appear BEFORE the configured element. Please note that this only applies if there are no manually added placeholders in the content.'),
+  );
+  $form['global_inline_settings']['dennis_dfp_inline_min_distance'] = array(
+    '#type' => 'select',
+    '#title' => t('Minimum distance between ad slots'),
+    '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
+    '#default_value' => variable_get('dennis_dfp_inline_min_distance', DENNIS_DFP_INLINE_MIN_DISTANCE),
+    '#description' => t('The minimum distance measured in paragraphs between the automated ad slot placements in content. If content is shorter then ads will be added to the end of the content.'),
+  );
 }

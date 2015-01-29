@@ -1,15 +1,16 @@
 define([
+  'drupal',
   'dfpinline/renderer',
   'domReady!',
   'has',
-], function(Renderer) {
+], function(Drupal, Renderer) {
 
   var app = {
     init: function() {
       var r = false;
 
       try {
-        r = new Renderer('.node-full > .content > .field-name-body');
+        r = new Renderer(Drupal.settings.dennisDfpInline.config.selector);
         r.field && r.init();
       }
       catch(err) {
@@ -22,7 +23,11 @@ define([
 
   return {
     init: function() {
-      return !!(window.googletag && app.init());
+      return !!(window.googletag &&
+        Drupal.settings.dennisDfpInline &&
+        Drupal.settings.dennisDfpInline.config &&
+        Drupal.settings.dennisDfpInline.config.selector &&
+        app.init());
     }
   };
 });

@@ -11,7 +11,7 @@ define([
 ], function(doc, $, Drupal, utils, undefined) {
 
   var config = Drupal.settings.dennisDfpInline.config;
-  var pattern = new RegExp('<!--#dfpinline#-->', 'g');
+  var pattern = new RegExp(config.placeholder, 'g');
 
   /**
    * Content analyser constructor.
