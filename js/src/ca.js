@@ -23,7 +23,7 @@ define([
     this.element = el;
     this.tags = Drupal.settings.dennisDfpInline.tags || [];
     this.placeholderTags = 0;
-    this.tagsLeft = this.tags.length;
+    this.tagsLeft = Object.keys(this.tags);
     this.mapping = [];
 
     this.tree = doc.createDocumentFragment();
@@ -48,12 +48,13 @@ define([
     processPlaceholders: function() {
       // Search for editorially inserted placeholders.
       utils.each(this.content.match(pattern) || [], (function(match, key) {
-        if (this.tagsLeft > 0) {
+        if (this.tagsLeft.length > 0) {
           // Convert the current match to a pattern.
           var re = new RegExp(match);
           // Generate placeholder elements to replace of the HTML comment.
           var skel = doc.createElement('span');
           var el = doc.createElement('span');
+          var leftoverKey = this.tagsLeft.indexOf(key + ''); // Cast to string.
           el.id = 'dfpinline-placeholder-' + key;
           el.className = 'dfpinline-manual-placeholder';
           skel.appendChild(el);
@@ -61,7 +62,8 @@ define([
           // Replace the match with the placeholder element.
           this.content = this.content.replace(re, skel.innerHTML);
           this.placeholderTags++;
-          this.tagsLeft--;
+          // Remove the tag pointer just processed.
+          this.tagsLeft.splice(leftoverKey, 1);
         }
       }).bind(this)); // Function.prototype.bind to keep context.
 
