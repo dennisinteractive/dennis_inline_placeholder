@@ -9,11 +9,20 @@ define([
   var settings = Drupal.settings.dennisDfpInline;
 
   function Renderer(selector) {
+    if (!settings || !settings.config) {
+      throw new Error('Configuration missing.');
+    }
+
     if (!settings.tags) {
-      throw new Error('There are no defined inline ad tags to work with.');
+      throw new Error('There are no ad tags defined.');
     }
 
     this.field = doc.querySelector(selector);
+
+    if (!this.field) {
+      throw new Error('Element not found.');
+    }
+
     this.adsReady = [];
     this.analyser = null;
   }

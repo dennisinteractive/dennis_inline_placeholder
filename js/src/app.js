@@ -6,8 +6,15 @@ define([
 
   var app = {
     init: function() {
-      var r = new Renderer('.node-full > .content > .field-name-body');
-      r.init();
+      var r = false;
+
+      try {
+        r = new Renderer('.node-full > .content > .field-name-body');
+        r.field && r.init();
+      }
+      catch(err) {
+        throw '[dfpinline] Renderer failed to instantiate: ' + err.message;
+      }
 
       return r;
     }
