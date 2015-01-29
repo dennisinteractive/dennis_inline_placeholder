@@ -117,9 +117,6 @@ define([
     /**
      * Generate mapping of automated placements.
      *
-     * @todo this should support partial processing, i.e when there are more
-     * slots than editorially injercted placements.
-     *
      * @return {Object} The instantiated object.
      */
     generateAutomatedMapping: function() {
@@ -137,6 +134,8 @@ define([
       var pos = 0;
       var i = firstPosition;
       var method;
+      var hasManual;
+      var last = false;
 
       for (var key in this.tags) {
         // Check if the tag is already placed manually.
@@ -145,19 +144,21 @@ define([
           // the calculation of the next position.
           pos = parseInt(utils.getKeyByValue(children, this.mapping[key][0]));
           i++;
+          hasManual = true;
           continue;
         }
 
         // Calculate position.
         pos = (i++ === firstPosition) ? firstPosition : (pos + minDistance);
-        // Inject before if tag is not to be added to the end.
-        method = 'before';
+        // Inject before if manual placement has not happened yet.
+        method = hasManual ? 'after' : 'before';
         // If currently calculated position is too far, stick the ad at the end.
         if (pos > children.length - 1) {
           pos = children.length -1;
           method = 'after';
+          last = true;
         }
-        this.mapping.push([children[pos], method, this.tags[key][0]]);
+        this.mapping.push([children[pos], method, this.tags[key][0], last]);
       }
 
       return this;

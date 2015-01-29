@@ -36,13 +36,16 @@ define([
      */
     render: function() {
       var ca = this.analyser;
-      var target, method, tag;
+      var target, method, tag, last;
 
       // Process the generated mapping. This inserts specified DFP ad wrappers.
       utils.each(ca.mapping, (function(item) {
+        var tree = this.analyser.tree;
+
         target = item[0];
         method = item[1];
         tag = item[2];
+        last = item[3];
 
         // Get the tag spec from settings.
         var tagSpec = settings.tags.filter(function(val) {
@@ -51,16 +54,21 @@ define([
 
         // Generate the wrapper element of the ad slot.
         var $adWrapper = $('<div>', {
-          id: 'dfp-ad-' + tag + '-wrapper',
-          class: 'dfp-tag-wrapper dfpinline-wrapper ' + tagSpec[0][1].classes
+          id: 'dfpinline-ad-' + tag + '-wrapper',
+          class: 'dfpinline-wrapper dfp-tag-wrapper ' + tagSpec[0][1].classes
         });
         $('<div>', {
           id: 'dfp-ad-' + tag,
           class: 'dfp-tag-wrapper'
         }).appendTo($adWrapper);
 
+        // If position is set as last, make sure it is appended to the very end
+        // to avoid mixing up ad order.
+        if (last) {
+          target = tree.firstElementChild.lastElementChild;
+        }
         // Add the final ad slot wrapper to the document fragment.
-        $(target, this.tree)[method]($adWrapper);
+        $(target, tree)[method]($adWrapper);
         this.adsReady.push('dfp-ad-' + tag);
       }).bind(this)); // Function.prototype.bind to keep context.
 
@@ -100,8 +108,8 @@ define([
       ca.generateMapping();
 
       if (ca.mapping) {
-      this.render();
-      this.display();
+        this.render();
+        this.display();
       }
 
       return this;
