@@ -117,6 +117,9 @@ define([
     /**
      * Generate mapping of automated placements.
      *
+     * @todo Implement minimum paragraph length to avoid spoiling content with
+     * too short paragraphs.
+     *
      * @return {Object} The instantiated object.
      */
     generateAutomatedMapping: function() {

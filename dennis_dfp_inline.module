@@ -193,33 +193,10 @@ function dennis_dfp_inline_form_ctools_export_ui_edit_item_form_alter(&$form, &$
       ),
     );
 
-    $form['tag_display_options']['inline']['float'] = array(
-      '#type' => 'select',
-      '#title' => t('Float'),
-      '#description' => t('Select ad container floating.'),
-      '#default_value' => isset($tag->settings['inline']['float']) ? $tag->settings['inline']['float'] : '',
-      '#options' => array(
-        '' => t('None'),
-        'left' => t('Left'),
-        'right' => t('Right'),
-      ),
-      '#parents' => array('settings', 'inline', 'float'),
-    );
-
-    $form['tag_display_options']['inline']['margin'] = array(
-      '#type' => 'textfield',
-      '#title' => t('CSS margin'),
-      '#description' => t('Add CSS margin values'),
-      '#size' => 20,
-      '#field_suffix' => 'px',
-      '#default_value' => isset($tag->settings['inline']['margin']) ? $tag->settings['inline']['margin'] : '',
-      '#parents' => array('settings', 'inline', 'margin'),
-    );
-
     $form['tag_display_options']['inline']['classes'] = array(
       '#type' => 'textfield',
       '#title' => t('CSS classes'),
-      '#description' => t('If rendered inline, add optional CSS class names to the wrapper element of the ad slot.'),
+      '#description' => t('Add optional CSS classes to the wrapper element of the inline ad slot.'),
       '#default_value' => isset($tag->settings['inline']['classes']) ? $tag->settings['inline']['classes'] : '',
       '#parents' => array('settings', 'inline', 'classes'),
     );
