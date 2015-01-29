@@ -50,6 +50,7 @@ define([
           var skel = doc.createElement('span');
           var el = doc.createElement('span');
           var leftoverKey = this.tagsLeft.indexOf(key + ''); // Cast to string.
+
           el.id = 'dfpinline-placeholder-' + key;
           el.className = 'dfpinline-manual-placeholder';
           skel.appendChild(el);
@@ -127,16 +128,37 @@ define([
         return this;
       }
 
-      var children = this.tree.querySelectorAll(childrenSelector);
-      var minDistance = (config && config.minDistance) || 3;
-      var firstPosition = (config && config.firstPosition) || 1;
-      var pos;
-      var i = 0;
+      // @todo Using the immediate child elements for the analysis. This could
+      // do with a selector with predefined elements in the future.
+      var children = this.tree.firstElementChild.children;
+
+      var minDistance = (config && config.minDistance) || 2;
+      var firstPosition = ((config && config.firstPosition) || 1) - 1;
+      var pos = 0;
+      var i = firstPosition;
+      var method;
 
       for (var key in this.tags) {
-        i++;
-        pos = (i === firstPosition) ? firstPosition : i + minDistance;
-        this.mapping.push([children[pos], 'before', this.tags[key][0]]);
+        // Check if the tag is already placed manually.
+        if (this.tagsLeft.indexOf(key + '') === -1) {
+          // Get the position of the current manual added tag and use that for
+          // the calculation of the next position.
+          pos = parseInt(utils.getKeyByValue(children, this.mapping[key][0]));
+          i++;
+          continue;
+        }
+
+        // Calculate position.
+        pos = (i++ === firstPosition) ? firstPosition : (pos + minDistance);
+        // Inject before if tag is not to be added to the end.
+        method = 'before';
+        // If currently calculated position is too far, stick the ad at the end.
+        if (pos > children.length - 1) {
+          pos = children.length -1;
+          method = 'after';
+        }
+        this.mapping.push([children[pos], method, this.tags[key][0]]);
+        console.log('mapping segment done');
       }
 
       return this;

@@ -4,7 +4,7 @@
  * dennis_dfp_inline.module
  */
 
-define("DENNIS_DFP_INLINE_FIRST_POSITION", 1);
+define("DENNIS_DFP_INLINE_FIRST_POSITION", 2);
 define("DENNIS_DFP_INLINE_MIN_DISTANCE", 3);
 define("DENNIS_DFP_INLINE_PARAGRAPH_LENGTH", 100);
 
