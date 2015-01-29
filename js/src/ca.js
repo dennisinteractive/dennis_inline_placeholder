@@ -158,7 +158,6 @@ define([
           method = 'after';
         }
         this.mapping.push([children[pos], method, this.tags[key][0]]);
-        console.log('mapping segment done');
       }
 
       return this;
