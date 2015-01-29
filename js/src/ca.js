@@ -11,7 +11,6 @@ define([
 ], function(doc, $, Drupal, utils, undefined) {
 
   var config = Drupal.settings.dennisDfpInline.config;
-  var childrenSelector = 'p, div, h2, h3, h4, h5, h6, pre';
   var pattern = new RegExp('<!--#dfpinline#-->', 'g');
 
   /**
@@ -28,11 +27,7 @@ define([
 
     this.tree = doc.createDocumentFragment();
     this.tree.appendChild(el.cloneNode(true));
-
     this.content = this.tree.children[0].innerHTML;
-    this.contentOriginal = this.content;
-
-    console.log('constructor done');
   }
 
   ContentAnalyser.prototype = {
@@ -127,6 +122,7 @@ define([
      * @return {Object} The instantiated object.
      */
     generateAutomatedMapping: function() {
+      // Return early if there isn't any tags left to process.
       if (!this.tagsLeft) {
         return this;
       }

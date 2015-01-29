@@ -62,7 +62,7 @@ define([
         // Add the final ad slot wrapper to the document fragment.
         $(target, this.tree)[method]($adWrapper);
         this.adsReady.push('dfp-ad-' + tag);
-      }).bind(this));
+      }).bind(this)); // Function.prototype.bind to keep context.
 
       // Finally replace the original field contents with the new contents.
       ca.element.parentNode.replaceChild(ca.tree, ca.element);
