@@ -61,7 +61,7 @@ module.exports = function(grunt) {
           findNestedDependencies: true,
           preserveLicenseComments: false,
           generateSourceMaps: false,
-          optimize: 'none' // 'uglify2' or 'none'
+          optimize: 'uglify2' // 'uglify2' or 'none'
         }
       }
     },

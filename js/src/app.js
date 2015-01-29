@@ -13,7 +13,7 @@ define([
         r.field && r.init();
       }
       catch(err) {
-        throw '[dfpinline] Renderer failed to instantiate: ' + err.message;
+        throw new Error('[dfpinline] Renderer failed to instantiate: ' + err.message);
       }
 
       return r;
@@ -22,7 +22,7 @@ define([
 
   return {
     init: function() {
-      return app.init();
+      return !!(window.googletag && app.init());
     }
   };
 });
