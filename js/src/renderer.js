@@ -38,11 +38,6 @@ define([
       var ca = this.analyser;
       var target, method, tag;
 
-      // Process editorially added placeholders.
-      ca.processPlaceholders();
-      // Generate mapping info.
-      ca.generateMapping();
-
       // Process the generated mapping. This inserts specified DFP ad wrappers.
       utils.each(ca.mapping, (function(item) {
         target = item[0];
@@ -97,8 +92,17 @@ define([
      */
     init: function() {
       this.analyser = new ContentAnalyser(this.field);
+      var ca = this.analyser;
+
+      // Process editorially added placeholders.
+      ca.processPlaceholders();
+      // Generate mapping info.
+      ca.generateMapping();
+
+      if (ca.mapping) {
       this.render();
       this.display();
+      }
 
       return this;
     }
