@@ -11,6 +11,18 @@ define("DENNIS_DFP_INLINE_MIN_DISTANCE", 3);
 define("DENNIS_DFP_INLINE_PARAGRAPH_LENGTH", 100);
 
 /**
+ * Implements hook_theme().
+ */
+function dennis_dfp_inline_theme() {
+  return array(
+    'dennis_dfp_inline_context_form' => array(
+      'render element' => 'form',
+      // 'file' => 'tabledrag_example_simple_form.inc',
+    ),
+  );
+}
+
+/**
  * Implements hook_context_registry().
  */
 function dennis_dfp_inline_context_registry() {
@@ -49,7 +61,7 @@ function dennis_dfp_inline_page_build(&$page) {
     $plugin->execute();
 
     if (isset($plugin->inline_tags) && !empty($plugin->inline_tags)) {
-      dfp_inline_tags($plugin->inline_tags);
+      dfp_inline_tags(array_keys($plugin->inline_tags));
     }
   }
 }
@@ -261,4 +273,60 @@ function dennis_dfp_inline_form_dfp_admin_settings_alter(&$form, &$form_state) {
     '#default_value' => variable_get('dennis_dfp_inline_min_distance', DENNIS_DFP_INLINE_MIN_DISTANCE),
     '#description' => t('The minimum distance measured in paragraphs between the automated ad slot placements in content. If content is shorter then ads will be added to the end of the content.'),
   );
+}
+
+/**
+ * Theme the context reaction form.
+ */
+function theme_dennis_dfp_inline_context_form($variables) {
+  $form = $variables['form'];
+  $rows = array();
+
+  // Iterate over each element in our $form['inline_tags'] array.
+  foreach (element_children($form['inline_tags']) as $id) {
+    // Add custom class for tabledrag functionality.
+    $form['inline_tags'][$id]['weight']['#attributes']['class'] = array('tag-weight');
+    // Populate rows.
+    $rows[] = array(
+      'data' => array(
+        // Enabled.
+        drupal_render($form['inline_tags'][$id]['enabled']),
+        // Weight.
+        drupal_render($form['inline_tags'][$id]['weight']),
+        // Name.
+        drupal_render($form['inline_tags'][$id]['name']),
+        // Macbine name.
+        drupal_render($form['inline_tags'][$id]['machinename']),
+      ),
+      'class' => array('draggable'),
+    );
+  }
+
+  // Define header.
+  $header = array(t('Enabled'), t('Name'), t('Machine name'), t('Weight'));
+  // Table needs an id so tabledrag.js can target it.
+  $table_id = 'inline-tags-table';
+  // Theme output as table.
+  $output = theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array('id' => $table_id),
+  ));
+  // And then render any remaining form elements.
+  $output .= drupal_render_children($form);
+  // Add tabledrag functionality.
+  drupal_add_tabledrag($table_id, 'order', 'sibling', 'tag-weight');
+
+  return $output;
+}
+
+/**
+ * Helper function for sorting entry weights.
+ */
+function _dennis_dfp_inline_form_weight_arraysort($a, $b) {
+  if (isset($a['weight']['#default_value']) && isset($b['weight']['#default_value'])) {
+    return $a['weight']['#default_value'] < $b['weight']['#default_value'] ? -1 : 1;
+  }
+
+  return 0;
 }
