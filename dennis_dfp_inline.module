@@ -17,7 +17,6 @@ function dennis_dfp_inline_theme() {
   return array(
     'dennis_dfp_inline_context_form' => array(
       'render element' => 'form',
-      // 'file' => 'tabledrag_example_simple_form.inc',
     ),
   );
 }
@@ -98,9 +97,8 @@ function dfp_inline_tags($tags = array()) {
 
       // Prepare some configuration for the JavaScript.
       unset($tag->settings['inline']['use']);
-      // $inline_tag_data[$machine_name] = $tag->settings['inline'];
       $inline_tag_data[] = array($machine_name, $tag->settings['inline']);
-      // This triggers the necessary Google Publisher Tag code in <head>.
+      // This adds the necessary Google Publisher Tag code in <head>.
       render($tag_render);
     }
   }
@@ -114,6 +112,7 @@ function dfp_inline_tags($tags = array()) {
     'placeholder' => variable_get('dennis_dfp_inline_placeholder', DENNIS_DFP_INLINE_PLACEHOLDER),
     'firstPosition' => variable_get('dennis_dfp_inline_first_position', DENNIS_DFP_INLINE_FIRST_POSITION),
     'minDistance' => variable_get('dennis_dfp_inline_min_distance', DENNIS_DFP_INLINE_MIN_DISTANCE),
+    // @todo Implement minimum block length to refine content analysis.
     'minParaLength' => variable_get('dennis_dfp_inline_paragraph_length', DENNIS_DFP_INLINE_PARAGRAPH_LENGTH),
   );
   // Add any collected JS configuration.
@@ -168,6 +167,8 @@ function _dennis_dfp_inline_load_js() {
 
 /**
  * Implements hook_form_FORM_ID_alter().
+ *
+ * @todo  Add vertical tabs support for this.
  *
  * Extend DFP tag settings with inline configuration.
  */
@@ -253,7 +254,7 @@ function dennis_dfp_inline_form_dfp_admin_settings_alter(&$form, &$form_state) {
   );
   $form['global_inline_settings']['dennis_dfp_inline_first_position'] = array(
     '#type' => 'select',
-    '#title' => t('Refresh ads on every nth slide change'),
+    '#title' => t('Automatically insert the first ad tag'),
     '#options' => array(
       1 => t('first'),
       2 => t('second'),
@@ -261,15 +262,16 @@ function dennis_dfp_inline_form_dfp_admin_settings_alter(&$form, &$form_state) {
       4 => t('fourth'),
       5 => t('fifth'),
     ),
-    '#field_prefix' => 'Before the',
-    '#field_suffix' => 'paragraph or other block level element (media file, etc.)',
+    '#field_prefix' => t('Before the'),
+    '#field_suffix' => t('paragraph or other block level element (media file, etc.)'),
     '#default_value' => variable_get('dennis_dfp_inline_first_position', DENNIS_DFP_INLINE_FIRST_POSITION),
     '#description' => t('The first ad slot should appear BEFORE the configured element. Please note that this only applies if there are no manually added placeholders in the content.'),
   );
   $form['global_inline_settings']['dennis_dfp_inline_min_distance'] = array(
     '#type' => 'select',
-    '#title' => t('Minimum distance between ad slots'),
+    '#title' => t('Minimum distance between subsequent ad slots in content'),
     '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
+    '#field_suffix' => t('paragraph or other block level element (media file, etc.)'),
     '#default_value' => variable_get('dennis_dfp_inline_min_distance', DENNIS_DFP_INLINE_MIN_DISTANCE),
     '#description' => t('The minimum distance measured in paragraphs between the automated ad slot placements in content. If content is shorter then ads will be added to the end of the content.'),
   );

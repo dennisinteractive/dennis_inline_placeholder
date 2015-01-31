@@ -82,7 +82,7 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
   }
 
   /**
-   * Check each currently set context for DFP ad slot machine names.
+   * Check each currently set context for inline DFP ad slots.
    */
   function execute() {
     foreach ($this->get_contexts() as $context_name => $context) {

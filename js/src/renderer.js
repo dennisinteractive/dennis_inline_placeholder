@@ -8,6 +8,15 @@ define([
 
   var settings = Drupal.settings.dennisDfpInline;
 
+  /**
+   * Creates a new Renderer.
+   *
+   * @constructor
+   * @class Inserts ads into content defined by the ContentAnalyser.
+   * @param {String} selector Selector to define the element to modify.
+   * @property {Object} analyser Store the ContentAnalyser class
+   * @property {Array} adsReady Ad slots ready to render.
+   */
   function Renderer(selector) {
     if (!settings || !settings.config) {
       throw new Error('Configuration missing.');

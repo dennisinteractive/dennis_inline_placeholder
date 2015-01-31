@@ -1,7 +1,6 @@
 define([
   'drupal',
   'dfpinline/renderer',
-  'domReady!',
   'has',
 ], function(Drupal, Renderer) {
 

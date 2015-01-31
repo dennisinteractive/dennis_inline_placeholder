@@ -14,7 +14,18 @@ define([
   var pattern = new RegExp(config.placeholder, 'g');
 
   /**
-   * Content analyser constructor.
+   * Creates a ContentAnalyser
+   *
+   * @constructor
+   * @class Class which analyses content and generates placement mappings.
+   * @property {Object} element The Element object to work on.
+   * @property {Array} tags An array of tag configuration.
+   * @property {Integer} placeholderTags Counter for manual placeholders.
+   * @property {Array} tagsLeft Maintain the number of tags to process.
+   * @property {Array} mapping Array of mapping data which tells the Renderer
+   *   where to insert ads in this.element.
+   * @property {Object} tree Document fragment for the modified element children.
+   * @property {String} content HTML contents of the document fragment.
    *
    * @param {Array} el jQuery object to process.
    */
