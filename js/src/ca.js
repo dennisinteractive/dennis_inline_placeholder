@@ -143,8 +143,8 @@ define([
       // do with a selector with predefined elements in the future.
       var children = this.tree.firstElementChild.children;
 
-      var minDistance = (config && config.minDistance) || 2;
-      var firstPosition = ((config && config.firstPosition) || 1) - 1;
+      var minDistance = (config && parseInt(config.minDistance)) || 2;
+      var firstPosition = ((config && parseInt(config.firstPosition)) || 1) - 1;
       var pos = 0;
       var i = firstPosition;
       var method;
