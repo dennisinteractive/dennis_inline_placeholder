@@ -8,7 +8,7 @@ define([
   'jquery',
   'drupal',
   'utils'
-], function(doc, $, Drupal, utils, undefined) {
+], function(doc, Drupal, utils, undefined) {
 
   var config = Drupal.settings.dennisDfpInline.config;
   var pattern = new RegExp(config.placeholder, 'g');
@@ -90,7 +90,7 @@ define([
      * @return {Object} The instantiated object.
      */
     updateFragment: function() {
-      $(this.tree.firstElementChild).html(this.content);
+      this.tree.firstElementChild.innerHTML = this.content;
 
       return this;
     },
