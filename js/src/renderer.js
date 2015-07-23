@@ -1,3 +1,8 @@
+/**
+ * Renderer module
+ *
+ * @module dfpinline/renderer
+ */
 define([
   'domReady!',
   'drupal',
@@ -12,10 +17,19 @@ define([
    * Creates a new Renderer.
    *
    * @constructor
-   * @class Inserts ads into content defined by the ContentAnalyser.
-   * @param {String} selector Selector to define the element to modify.
-   * @property {Object} analyser Store the ContentAnalyser class
-   * @property {Array} adsReady Ad slots ready to render.
+   * @alias
+   *   module:dfpinline/renderer
+   * @class
+   *   Inserts ads into content defined by the ContentAnalyser.
+   *
+   * @param {String} selector
+   *   Selector to define the element to modify.
+   *
+   * @property {Object} analyser
+   *   Store the ContentAnalyser class
+   *
+   * @property {Array} adsReady
+   *   Ad slots ready to render.
    */
   function Renderer(selector) {
     if (!settings || !settings.config) {
@@ -41,31 +55,33 @@ define([
     /**
      * Render slots in the document fragment of Content Analyser.
      *
-     * @return {Object} The instantiated object.
+     * @return {Object}
+     *   The instantiated object.
      */
     render: function() {
       var ca = this.analyser;
       var target, method, tag, last;
 
-      // Process the generated mapping. This inserts specified DFP ad wrappers.
+      // Iterate over the array containing the mapping for all ad tags to be
+      // inserted and generate the elements for the DFP ads in the document
+      // fragment.
       utils.each(ca.mapping, (function(item) {
-        var tree = this.analyser.tree;
-
         target = item[0];
         method = item[1];
         tag = item[2];
         last = item[3];
 
+        var tree = this.analyser.tree;
         // Get the tag spec from settings.
         var tagSpec = settings.tags.filter(function(val) {
           return val[0] === tag;
         });
-
         // Generate the wrapper element of the ad slot.
         var $adWrapper = $('<div>', {
           id: 'dfpinline-ad-' + tag + '-wrapper',
           class: 'dfpinline-wrapper dfp-tag-wrapper ' + tagSpec[0][1].classes
         });
+
         $('<div>', {
           id: 'dfp-ad-' + tag,
           class: 'dfp-tag-wrapper'
@@ -76,6 +92,7 @@ define([
         if (last) {
           target = tree.firstElementChild.lastElementChild;
         }
+
         // Add the final ad slot wrapper to the document fragment.
         $(target, tree)[method]($adWrapper);
         this.adsReady.push('dfp-ad-' + tag);
@@ -88,9 +105,10 @@ define([
     },
 
     /**
-     * Display DFP ads
+     * Display DFP ads.
      *
-     * @return {Object} The instantiated object.
+     * @return {Object}
+     *   The instantiated object.
      */
     display: function() {
       utils.each(this.adsReady, function(slot) {
@@ -105,7 +123,8 @@ define([
     /**
      * Initialise the Renderer.
      *
-     * @return {Object} The instantiated object.
+     * @return {Object}
+     *   The instantiated object.
      */
     init: function() {
       this.analyser = new ContentAnalyser(this.field);

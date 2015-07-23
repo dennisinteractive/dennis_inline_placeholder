@@ -1,3 +1,12 @@
+/**
+ * @module dfpinline/app
+ *
+ * @description
+ *   This application expects configuration values in `Drupal.settings` prepared
+ *   by the Drupal module.
+ *
+ * @module dfpinline/app
+ */
 define([
   'drupal',
   'dfpinline/renderer',

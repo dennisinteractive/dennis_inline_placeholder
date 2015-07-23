@@ -1,11 +1,10 @@
 /**
- * @file ca.js
+ * Content analyser module
  *
- * Content analyser module.
+ * @module dfpinline/ca
  */
 define([
   'domReady!',
-  'jquery',
   'drupal',
   'utils'
 ], function(doc, Drupal, utils, undefined) {
@@ -17,17 +16,40 @@ define([
    * Creates a ContentAnalyser
    *
    * @constructor
-   * @class Class which analyses content and generates placement mappings.
-   * @property {Object} element The Element object to work on.
-   * @property {Array} tags An array of tag configuration.
-   * @property {Integer} placeholderTags Counter for manual placeholders.
-   * @property {Array} tagsLeft Maintain the number of tags to process.
-   * @property {Array} mapping Array of mapping data which tells the Renderer
-   *   where to insert ads in this.element.
-   * @property {Object} tree Document fragment for the modified element children.
-   * @property {String} content HTML contents of the document fragment.
+   * @alias
+   *   module:dfpinline/ca
+   * @class
+   *   Class which analyses content and generates placement mappings.
    *
-   * @param {Array} el jQuery object to process.
+   * @property {Object} element
+   *   The Element object to work on.
+   *
+   * @property {Array} tags
+   *   An array of tags. Every item in the array is an array where the first
+   *   child is a string with the machine name of the ad tag and the second is
+   *   an object literal with additional attributes. Currently only `classes` is
+   *   implemented.
+   *   Example `[ 0 => [ 0 => 'mpu_1', 1 => { classes: 'inline-1'} ] ]`
+   *   Values are provided from back-end through `Drupal.settings.dennisDfpInline.tags`
+   *
+   * @property {Integer} placeholderTags
+   *   Internal counter for manual placeholders.
+   *
+   * @property {Array} tagsLeft
+   *   An array of keys to help maintaning the number of tags left to process.
+   *
+   * @property {Array} mapping
+   * Array of mapping data which tells the Renderer where to insert ads in
+   * `this.element`.
+   *
+   * @property {Object} tree
+   *   A DOM document fragment storing modified element children.
+   *
+   * @property {String} content
+   *   HTML contents of the document fragment.
+   *
+   * @param {Array} el
+   *   Element object to process.
    */
   function ContentAnalyser(el) {
     this.element = el;
@@ -44,12 +66,11 @@ define([
   ContentAnalyser.prototype = {
     /**
      * Search the content for editorially placed placeholders in the content.
-     *
-     * Search the content for editorially inserted placeholders in the content.
      * If found, replace them with an element so they can later be replaced with
      * actual ad slots.
      *
-     * @return {Object} The instantiated object.
+     * @return {Object}
+     *   The instantiated object.
      */
     processPlaceholders: function() {
       // Search for editorially inserted placeholders.
@@ -87,7 +108,8 @@ define([
      *
      * Please note that this is currently done via jQuery .html() method.
      *
-     * @return {Object} The instantiated object.
+     * @return {Object}
+     *   The instantiated object.
      */
     updateFragment: function() {
       this.tree.firstElementChild.innerHTML = this.content;
@@ -95,6 +117,12 @@ define([
       return this;
     },
 
+    /**
+     * Generate a mapping between placeholders and ad tags.
+     *
+     * @return {Object}
+     *   The instantiated object.
+     */
     generateMapping: function() {
       // Return early if there is nothing to process.
       if (this.placeholderTags === 0 && this.tagsLeft < 1) {
@@ -113,7 +141,8 @@ define([
     /**
      * Generate mapping of any editorial placeholders.
      *
-     * @return {Object} The instantiated object.
+     * @return {Object}
+     *   The instantiated object.
      */
     generatePlaceholderMapping: function() {
       if (this.placeholderTags > 0) {
@@ -128,10 +157,11 @@ define([
     /**
      * Generate mapping of automated placements.
      *
+     * @return {Object}
+     *   The instantiated object.
+     *
      * @todo Implement minimum paragraph length to avoid spoiling content with
      * too short paragraphs.
-     *
-     * @return {Object} The instantiated object.
      */
     generateAutomatedMapping: function() {
       // Return early if there isn't any tags left to process.
