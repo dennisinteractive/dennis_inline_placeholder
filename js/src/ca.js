@@ -60,7 +60,7 @@ define([
 
     this.tree = doc.createDocumentFragment();
     this.tree.appendChild(el.cloneNode(true));
-    this.content = this.tree.children[0].innerHTML;
+    this.content = this.tree.querySelector('*').innerHTML;
   }
 
   ContentAnalyser.prototype = {
@@ -171,7 +171,7 @@ define([
 
       // @todo Using the immediate child elements for the analysis. This could
       // do with a selector with predefined elements in the future.
-      var children = this.tree.firstElementChild.children;
+      var children = this.tree.querySelector('*').children;
 
       var minDistance = (config && parseInt(config.minDistance)) || 2;
       var firstPosition = ((config && parseInt(config.firstPosition)) || 1) - 1;
