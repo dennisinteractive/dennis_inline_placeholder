@@ -4,11 +4,7 @@
  * dennis_dfp_inline.module
  */
 
-define("DENNIS_DFP_INLINE_SELECTOR", '.node-full > .content > .field-name-body');
-define("DENNIS_DFP_INLINE_PLACEHOLDER", '<!--#dfpinline#-->');
-define("DENNIS_DFP_INLINE_FIRST_POSITION", 2);
-define("DENNIS_DFP_INLINE_MIN_DISTANCE", 3);
-define("DENNIS_DFP_INLINE_PARAGRAPH_LENGTH", 100);
+
 
 /**
  * Implements hook_theme().
@@ -132,9 +128,11 @@ function dfp_inline_tags($tags = array()) {
  * Load the JS application via require.
  */
 function _dennis_dfp_inline_load_js() {
+
   $js_devel = variable_get('dennis_js_devel', FALSE);
   $subfolder = ($js_devel) ? 'src' : 'dist';
   $path = drupal_get_path('module', 'dennis_dfp_inline') . '/js/' . $subfolder;
+
   $options = array(
     'returns' => 'app',
     'init' => 'app.init();',
@@ -172,163 +170,7 @@ function _dennis_dfp_inline_load_js() {
  *
  * Extend DFP tag settings with inline configuration.
  */
-function dennis_dfp_inline_form_ctools_export_ui_edit_item_form_alter(&$form, &$form_state) {
-  if ($form_state['plugin']['schema'] == 'dfp_tags') {
 
-    // Create a default tag object.
-    $tag = ($form_state['op'] == 'add' ? $form_state['item'] : $form_state['item']->raw);
 
-    $form['tag_display_options']['use'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Inline ad'),
-      '#description' => t('Render this slot inline in the body of content pages. Please note that an ad slot cannot be configured both as block and inline to avoid ad slot duplication.'),
-      '#default_value' => isset($tag->settings['inline']['use']) ? $tag->settings['inline']['use'] : FALSE,
-      '#parents' => array('settings', 'inline', 'use'),
-      '#states' => array(
-        'visible' => array(
-          ':input[name="settings[short_tag]"]' => array('checked' => FALSE),
-        ),
-        'enabled' => array(
-          ':input[name="block"]' => array('checked' => FALSE),
-        ),
-        'checked' => array(
-          ':input[name="block"]' => array('checked' => FALSE),
-          ':input[name="settings[short_tag]"]' => array('checked' => FALSE),
-        ),
-      ),
-    );
 
-    $form['tag_display_options']['inline'] = array(
-      '#type' => 'fieldset',
-      '#description' => t('Options for inline rendering'),
-      '#states' => array(
-        'visible' => array(
-          ':input[name="settings[inline][use]"]' => array('checked' => TRUE),
-          ':input[name="settings[short_tag]"]' => array('checked' => FALSE),
-          ':input[name="block"]' => array('checked' => FALSE),
-        ),
-      ),
-    );
 
-    $form['tag_display_options']['inline']['classes'] = array(
-      '#type' => 'textfield',
-      '#title' => t('CSS classes'),
-      '#description' => t('Add optional CSS classes to the wrapper element of the inline ad slot.'),
-      '#default_value' => isset($tag->settings['inline']['classes']) ? $tag->settings['inline']['classes'] : '',
-      '#parents' => array('settings', 'inline', 'classes'),
-    );
-  }
-}
-
-/**
- * Implements hook_form_FORM_ID_alter().
- *
- * Extend Global settings form with inline configuration.
- */
-function dennis_dfp_inline_form_dfp_admin_settings_alter(&$form, &$form_state) {
-
-  $form['global_inline_settings'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Global Inline Settings'),
-    '#description' => t('The following settings control the automated placement of inline ad slots.'),
-    '#group' => 'settings',
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-    '#attached' => array(
-      'js' => array(
-        'vertical-tabs' => drupal_get_path('module', 'dennis_dfp_inline') . '/js/admin/dennis_dfp_inline.admin.js',
-      ),
-    ),
-  );
-  $form['global_inline_settings']['dennis_dfp_inline_selector'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Field content selector'),
-    '#default_value' => variable_get('dennis_dfp_inline_selector', DENNIS_DFP_INLINE_SELECTOR),
-    '#description' => t('The DOM selector which translates to a single element with children as paragraphs or other blocks (media images, headings, etc.). This will be used for analysis and the placement of inline ad slots.'),
-  );
-  $form['global_inline_settings']['dennis_dfp_inline_placeholder'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Inline ad placeholder'),
-    '#default_value' => variable_get('dennis_dfp_inline_placeholder', DENNIS_DFP_INLINE_PLACEHOLDER),
-    '#description' => t('The pattern to use for manually inserted inline ad slot placeholders.'),
-  );
-  $form['global_inline_settings']['dennis_dfp_inline_first_position'] = array(
-    '#type' => 'select',
-    '#title' => t('Automatically insert the first ad tag'),
-    '#options' => array(
-      1 => t('first'),
-      2 => t('second'),
-      3 => t('third'),
-      4 => t('fourth'),
-      5 => t('fifth'),
-    ),
-    '#field_prefix' => t('Before the'),
-    '#field_suffix' => t('paragraph or other block level element (media file, etc.)'),
-    '#default_value' => variable_get('dennis_dfp_inline_first_position', DENNIS_DFP_INLINE_FIRST_POSITION),
-    '#description' => t('The first ad slot should appear BEFORE the configured element. Please note that this only applies if there are no manually added placeholders in the content.'),
-  );
-  $form['global_inline_settings']['dennis_dfp_inline_min_distance'] = array(
-    '#type' => 'select',
-    '#title' => t('Minimum distance between subsequent ad slots in content'),
-    '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
-    '#field_suffix' => t('paragraph or other block level element (media file, etc.)'),
-    '#default_value' => variable_get('dennis_dfp_inline_min_distance', DENNIS_DFP_INLINE_MIN_DISTANCE),
-    '#description' => t('The minimum distance measured in paragraphs between the automated ad slot placements in content. If content is shorter then ads will be added to the end of the content.'),
-  );
-}
-
-/**
- * Theme the context reaction form.
- */
-function theme_dennis_dfp_inline_context_form($variables) {
-  $form = $variables['form'];
-  $rows = array();
-
-  // Iterate over each element in our $form['inline_tags'] array.
-  foreach (element_children($form['inline_tags']) as $id) {
-    // Add custom class for tabledrag functionality.
-    $form['inline_tags'][$id]['weight']['#attributes']['class'] = array('tag-weight');
-    // Populate rows.
-    $rows[] = array(
-      'data' => array(
-        // Enabled.
-        drupal_render($form['inline_tags'][$id]['enabled']),
-        // Weight.
-        drupal_render($form['inline_tags'][$id]['weight']),
-        // Name.
-        drupal_render($form['inline_tags'][$id]['name']),
-        // Macbine name.
-        drupal_render($form['inline_tags'][$id]['machinename']),
-      ),
-      'class' => array('draggable'),
-    );
-  }
-
-  // Define header.
-  $header = array(t('Enabled'), t('Name'), t('Machine name'), t('Weight'));
-  // Table needs an id so tabledrag.js can target it.
-  $table_id = 'inline-tags-table';
-  // Theme output as table.
-  $output = theme('table', array(
-    'header' => $header,
-    'rows' => $rows,
-    'attributes' => array('id' => $table_id),
-  ));
-  // And then render any remaining form elements.
-  $output .= drupal_render_children($form);
-  // Add tabledrag functionality.
-  drupal_add_tabledrag($table_id, 'order', 'sibling', 'tag-weight');
-
-  return $output;
-}
-
-/**
- * Helper function for sorting entry weights.
- */
-function _dennis_dfp_inline_form_weight_arraysort($a, $b) {
-  if (isset($a['weight']['#default_value']) && isset($b['weight']['#default_value'])) {
-    return $a['weight']['#default_value'] < $b['weight']['#default_value'] ? -1 : 1;
-  }
-
-  return 0;
-}
