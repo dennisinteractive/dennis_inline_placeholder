@@ -49,19 +49,6 @@ function dennis_dfp_inline_context_plugins() {
 }
 
 /**
- * Implements hook_page_build().
- */
-//function dennis_dfp_inline_page_build(&$page) {
-//  if (module_exists('context') && $plugin = context_get_plugin('reaction', 'dennis_dfp_inline')) {
-//    $plugin->execute();
-//
-//    if (isset($plugin->inline_tags) && !empty($plugin->inline_tags)) {
-//      dfp_inline_tags(array_keys($plugin->inline_tags));
-//    }
-//  }
-//}
-
-/**
  * Add slot definitions and bootstrap data for Javascript.
  *
  * @param array $tags
@@ -124,6 +111,18 @@ function dfp_inline_tags($tags = array()) {
   return $inline_tag_data;
 }
 
+/**
+ * Implements hook_page_build().
+ */
+//function dennis_dfp_inline_page_build(&$page) {
+//  if (module_exists('context') && $plugin = context_get_plugin('reaction', 'dennis_dfp_inline')) {
+//    $plugin->execute();
+//
+//    if (isset($plugin->inline_tags) && !empty($plugin->inline_tags)) {
+//      dfp_inline_tags(array_keys($plugin->inline_tags));
+//    }
+//  }
+//}
 
 
 function dennis_dfp_inline_page_build() {
@@ -192,14 +191,6 @@ function _dennis_dfp_inline_load_js($placeholders) {
   // Init the app itself, this in both dev and production.
   dennis_js_add_js('dfpinline/app', $options);
 }
-
-/**
- * Implements hook_form_FORM_ID_alter().
- *
- * @todo  Add vertical tabs support for this.
- *
- * Extend DFP tag settings with inline configuration.
- */
 
 
 
