@@ -124,14 +124,44 @@ function dfp_inline_tags($tags = array()) {
   return $inline_tag_data;
 }
 
+
+
+function dennis_dfp_inline_page_build() {
+  $placeholders = [];
+  // Execute lazyadslot plugin.
+  if ($plugin = context_get_plugin('reaction', 'dennis_dfp_inline')) {
+    $plugin->execute();
+//dpm($plugin->placeholder_config,'$plugin->placeholder_config');
+
+
+    foreach ($plugin->placeholder_config as $values) {
+//      dpm($values,'$values!');
+
+//      $ad_tag = $values['ad_tag'];
+      $placeholders[]= $values;
+
+    }
+    _dennis_dfp_inline_add_js($placeholders);
+
+  }
+}
+
 /**
  * Load the JS application via require.
  */
-function _dennis_dfp_inline_load_js() {
+function _dennis_dfp_inline_load_js($placeholders) {
 
   $js_devel = variable_get('dennis_js_devel', FALSE);
   $subfolder = ($js_devel) ? 'src' : 'dist';
   $path = drupal_get_path('module', 'dennis_dfp_inline') . '/js/' . $subfolder;
+
+  // Add collected JS configuration.
+  if (!empty($placeholders)) {
+    // context settings now accessible from Drupal.settings.inlineBodyPlaceholder.placeholders
+    drupal_add_js(array('inlineBodyPlaceholder' => array('placeholders' => $placeholders)), 'setting');
+
+  }
+
 
   $options = array(
     'returns' => 'app',
