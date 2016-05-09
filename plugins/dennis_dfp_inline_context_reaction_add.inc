@@ -14,6 +14,7 @@ define("DENNIS_DFP_INLINE_MAX_NUMBER", 4);
  * Expose DFP Inline Tags as context reactions.
  */
 class dennis_dfp_inline_context_reaction_add extends context_reaction {
+  public $placeholder_config = [];
 
   /**
    * Allow individual ad tags to be selected.
@@ -25,7 +26,6 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
     if (!empty($settings['values'])) {
       $values = $settings['values'];
     }
-
 
     $form['inline_settings'] = array(
       '#type' => 'fieldset',
@@ -85,7 +85,6 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
       '#description' => t('Maximum number of placeholders in content.'),
     );
 
-
     return $form;
   }
 
@@ -110,17 +109,35 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
   /**
    * Check each currently set context for inline DFP ad slots.
    */
+//  function execute() {
+//    foreach ($this->get_contexts() as $context_name => $context) {
+//      if (isset($context->reactions['dennis_dfp_inline'])) {
+//        foreach ($context->reactions['dennis_dfp_inline'] as $key => $value) {
+//          if (!empty($value)) {
+//            $this->$key = $value;
+//          }
+//        }
+//        break;
+//      }
+//    }
+//  }
+//}
+
+  // Execute context.
   function execute() {
-    foreach ($this->get_contexts() as $context_name => $context) {
-      if (isset($context->reactions['dennis_dfp_inline'])) {
-        foreach ($context->reactions['dennis_dfp_inline'] as $key => $value) {
-          if (!empty($value)) {
-            $this->$key = $value;
-          }
+    $i = 0;
+    foreach ($this->get_contexts() as $context) {
+      if (!isset($context->reactions['dennis_dfp_inline'])) {
+        continue;
+      }
+//dpm($context->reactions['inline_body_placeholder']);
+      foreach ($context->reactions['dennis_dfp_inline'] as $values) {
+        if (!empty($values)) {
+          $this->placeholder_config[$i] = $values;
         }
-        break;
       }
     }
+//    dpm($this->placeholder_config);
   }
 }
 // @codingStandardsIgnoreEnd

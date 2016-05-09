@@ -58,92 +58,59 @@ function dennis_dfp_inline_context_plugins() {
  *   An array of ad slots with keys as machine name and individual slot settings
  *   for each slot.
  */
-function dfp_inline_tags($tags = array()) {
-  if (!$tags) {
-    return FALSE;
-  }
-
-  $inline_tag_data = array();
-
-  foreach ($tags as $machine_name) {
-    $tag_render = dfp_tag($machine_name);
-    if (!empty($tag_render) && empty($tag_render['dfp_wrapper']['tag']['#tag']->disabled)) {
-      $tag = $tag_render['dfp_wrapper']['tag']['#tag'];
-
-      // Check if tag is an inline tag once more. Although the context reaction
-      // can only be configured with inline tags, this function could be called
-      // directly from elsewhere.
-      if (!isset($tag->settings['inline']) || !isset($tag->settings['inline']['use']) || $tag->settings['inline']['use'] !== 1) {
-        watchdog('dennis_dfp_inline', 'Ad tag %machinename passed to dfp_inline_tags() but not configured as an inline tag.', array('%machinename' => $machinename), WATCHDOG_WARNING);
-        continue;
-      }
-
-      // Prepare some configuration for the JavaScript.
-      unset($tag->settings['inline']['use']);
-      $inline_tag_data[] = array($machine_name, $tag->settings['inline']);
-      // This adds the necessary Google Publisher Tag code in <head>.
-      render($tag_render);
-    }
-  }
-
-  if (empty($inline_tag_data)) {
-    return FALSE;
-  }
-
-  $config = array(
-    'selector' => variable_get('dennis_dfp_inline_selector', DENNIS_DFP_INLINE_SELECTOR),
-    'placeholder' => variable_get('dennis_dfp_inline_placeholder', DENNIS_DFP_INLINE_PLACEHOLDER),
-    'firstPosition' => variable_get('dennis_dfp_inline_first_position', DENNIS_DFP_INLINE_FIRST_POSITION),
-    'minDistance' => variable_get('dennis_dfp_inline_min_distance', DENNIS_DFP_INLINE_MIN_DISTANCE),
-    // @todo Implement minimum block length to refine content analysis.
-    'minParaLength' => variable_get('dennis_dfp_inline_paragraph_length', DENNIS_DFP_INLINE_PARAGRAPH_LENGTH),
-  );
-  // Add any collected JS configuration.
-  drupal_add_js(array(
-    'dennisDfpInline' => array(
-      'config' => $config,
-      'tags' => $inline_tag_data,
-    ),
-  ), 'setting');
-  // Load the JS app.
-  _dennis_dfp_inline_load_js();
-
-  return $inline_tag_data;
-}
-
-/**
- * Implements hook_page_build().
- */
-//function dennis_dfp_inline_page_build(&$page) {
-//  if (module_exists('context') && $plugin = context_get_plugin('reaction', 'dennis_dfp_inline')) {
-//    $plugin->execute();
+//function dfp_inline_tags($tags = array()) {
+//  if (!$tags) {
+//    return FALSE;
+//  }
 //
-//    if (isset($plugin->inline_tags) && !empty($plugin->inline_tags)) {
-//      dfp_inline_tags(array_keys($plugin->inline_tags));
+//  $inline_tag_data = array();
+//
+//  foreach ($tags as $machine_name) {
+//    $tag_render = dfp_tag($machine_name);
+//    if (!empty($tag_render) && empty($tag_render['dfp_wrapper']['tag']['#tag']->disabled)) {
+//      $tag = $tag_render['dfp_wrapper']['tag']['#tag'];
+//
+//      // Check if tag is an inline tag once more. Although the context reaction
+//      // can only be configured with inline tags, this function could be called
+//      // directly from elsewhere.
+//      if (!isset($tag->settings['inline']) || !isset($tag->settings['inline']['use']) || $tag->settings['inline']['use'] !== 1) {
+//        watchdog('dennis_dfp_inline', 'Ad tag %machinename passed to dfp_inline_tags() but not configured as an inline tag.', array('%machinename' => $machinename), WATCHDOG_WARNING);
+//        continue;
+//      }
+//
+//      // Prepare some configuration for the JavaScript.
+//      unset($tag->settings['inline']['use']);
+//      $inline_tag_data[] = array($machine_name, $tag->settings['inline']);
+//      // This adds the necessary Google Publisher Tag code in <head>.
+//      render($tag_render);
 //    }
 //  }
+//
+//  if (empty($inline_tag_data)) {
+//    return FALSE;
+//  }
+//
+//  $config = array(
+//    'selector' => variable_get('dennis_dfp_inline_selector', DENNIS_DFP_INLINE_SELECTOR),
+//    'placeholder' => variable_get('dennis_dfp_inline_placeholder', DENNIS_DFP_INLINE_PLACEHOLDER),
+//    'firstPosition' => variable_get('dennis_dfp_inline_first_position', DENNIS_DFP_INLINE_FIRST_POSITION),
+//    'minDistance' => variable_get('dennis_dfp_inline_min_distance', DENNIS_DFP_INLINE_MIN_DISTANCE),
+//    // @todo Implement minimum block length to refine content analysis.
+//    'minParaLength' => variable_get('dennis_dfp_inline_paragraph_length', DENNIS_DFP_INLINE_PARAGRAPH_LENGTH),
+//  );
+//  // Add any collected JS configuration.
+//  drupal_add_js(array(
+//    'dennisDfpInline' => array(
+//      'config' => $config,
+//      'tags' => $inline_tag_data,
+//    ),
+//  ), 'setting');
+//  // Load the JS app.
+//  _dennis_dfp_inline_load_js();
+//
+//  return $inline_tag_data;
 //}
 
-
-function dennis_dfp_inline_page_build() {
-  $placeholders = [];
-  // Execute lazyadslot plugin.
-  if ($plugin = context_get_plugin('reaction', 'dennis_dfp_inline')) {
-    $plugin->execute();
-//dpm($plugin->placeholder_config,'$plugin->placeholder_config');
-
-
-    foreach ($plugin->placeholder_config as $values) {
-//      dpm($values,'$values!');
-
-//      $ad_tag = $values['ad_tag'];
-      $placeholders[]= $values;
-
-    }
-    _dennis_dfp_inline_add_js($placeholders);
-
-  }
-}
 
 /**
  * Load the JS application via require.
@@ -193,5 +160,37 @@ function _dennis_dfp_inline_load_js($placeholders) {
 }
 
 
+/**
+ * Implements hook_page_build().
+ */
+//function dennis_dfp_inline_page_build(&$page) {
+//  if (module_exists('context') && $plugin = context_get_plugin('reaction', 'dennis_dfp_inline')) {
+//    $plugin->execute();
+//
+//    if (isset($plugin->inline_tags) && !empty($plugin->inline_tags)) {
+//      dfp_inline_tags(array_keys($plugin->inline_tags));
+//    }
+//  }
+//}
 
 
+function dennis_dfp_inline_page_build() {
+  $placeholders = [];
+  // Execute lazyadslot plugin.
+  if ($plugin = context_get_plugin('reaction', 'dennis_dfp_inline')) {
+    $plugin->execute();
+
+//dpm($plugin,'$plugin');
+
+
+    foreach ($plugin->placeholder_config as $values) {
+//      dpm($values,'$values!');
+
+//      $ad_tag = $values['ad_tag'];
+      $placeholders[]= $values;
+
+    }
+    _dennis_dfp_inline_load_js($placeholders);
+
+  }
+}
