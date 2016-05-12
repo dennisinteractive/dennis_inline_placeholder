@@ -4,8 +4,6 @@
  * dennis_dfp_inline.module
  */
 
-
-
 /**
  * Implements hook_theme().
  */
@@ -49,10 +47,9 @@ function dennis_dfp_inline_context_plugins() {
 }
 
 function dennis_dfp_inline_get_configuration(){
-
   $config = array();
 
-   // Execute lazyadslot plugin.
+  // Execute lazyadslot plugin.
   if ($plugin = context_get_plugin('reaction', 'dennis_dfp_inline')) {
     $plugin->execute();
     foreach ($plugin->placeholder_config as $values) {
@@ -65,10 +62,8 @@ function dennis_dfp_inline_get_configuration(){
 }
 
 function dennis_dfp_inline_page_build(){
-
   $config = dennis_dfp_inline_get_configuration();
   _dennis_dfp_inline_load_js($config);
-
 }
 
 /**
