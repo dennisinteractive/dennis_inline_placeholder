@@ -91,35 +91,10 @@ function _dennis_dfp_inline_load_js($placeholders) {
     drupal_add_js(array('dennisDfpInline' => array('config' => $config)), 'setting');
   }
 
-  $options = array(
-    'returns' => 'app',
-    'init' => 'app.init();',
-    'group' => DENNIS_JS_INLINE,
-    'environment' => DENNIS_JS_ENV_ALL,
-  );
-
-  // Add the application path prefix - development mode as default.
-  dennis_js_add_js('dfpinline', array(
-    'path' => $path,
-    'group' => JS_DEFAULT,
-  ));
-
-  // drupal_add_js(drupal_get_path('module', 'dennis_dfp_inline') . '/js/dist/dfpinline/app.393ac0c2.js');
-
   // Production mode extras.
-  if (!$js_devel) {
-    // Production mode needs the full path.
-    $options += array(
-      'path' => $path . '/dfpinline/app',
-    );
-    // Add bundle config.
-    dennis_js_add_js(array(
-      'bundles' => array(
-        'dfpinline/app' => array('domReady', 'has'),
-      ),
-    ), 'config');
+  if ($js_devel) {
+    drupal_add_js($path . '/ca.js');
+    drupal_add_js($path . '/renderer.js');
   }
-
-  // Init the app itself, this in both dev and production.
-  dennis_js_add_js('dfpinline/app', $options);
+  drupal_add_js($path . '/app.js');
 }
