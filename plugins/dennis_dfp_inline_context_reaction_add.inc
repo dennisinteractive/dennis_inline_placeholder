@@ -3,12 +3,7 @@
  * @file
  * Context reaction plugin for DFP Inline rendering.
  */
-define("DENNIS_DFP_INLINE_SELECTOR", '.field-name-body');
-define("DENNIS_DFP_INLINE_PLACEHOLDER", '<!--#dfpinline#-->');
-define("DENNIS_DFP_INLINE_FIRST_POSITION", 2);
-define("DENNIS_DFP_INLINE_MIN_DISTANCE", 3);
-define("DENNIS_DFP_INLINE_PARAGRAPH_LENGTH", 100);
-define("DENNIS_DFP_INLINE_MAX_NUMBER", 4);
+
 // @codingStandardsIgnoreStart
 /**
  * Expose DFP Inline Tags as context reactions.
@@ -20,39 +15,40 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
    * Allow individual ad tags to be selected.
    */
   function options_form($context) {
+
+    $values = [];
+    $form = [];
     // Get existing values for this form.
-    $values = $this->fetch_from_context($context);
+
+    $settings = $this->fetch_from_context($context);
+
 
     if (!empty($settings['values'])) {
       $values = $settings['values'];
     }
 
-    $form['inline_settings'] = array(
+    $form['values'] = array(
       '#type' => 'fieldset',
       '#title' => t('Global Inline Settings'),
       '#description' => t('The following settings control the automated placement of inline ad slots.'),
       '#group' => 'settings',
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
-//      '#attached' => array(
-//        'js' => array(
-//          'vertical-tabs' => drupal_get_path('module', 'dennis_dfp_inline') . '/js/admin/dennis_dfp_inline.admin.js',
-//        ),
-//      ),
     );
-    $form['inline_settings']['inline_selector'] = array(
+    $form['values']['inline_selector'] = array(
       '#type' => 'textfield',
       '#title' => t('Field content selector'),
-      '#default_value' => variable_get('dennis_dfp_inline_selector', DENNIS_DFP_INLINE_SELECTOR),
+      '#default_value' => isset($values['inline_selector']) ? $values['inline_selector'] : '',
       '#description' => t('The DOM selector which translates to a single element with children as paragraphs or other blocks (media images, headings, etc.). This will be used for analysis and the placement of inline ad slots.'),
     );
-    $form['inline_settings']['inline_placeholder'] = array(
+    $form['values']['inline_placeholder'] = array(
       '#type' => 'textfield',
       '#title' => t('Inline ad placeholder'),
-      '#default_value' => variable_get('dennis_dfp_inline_placeholder', DENNIS_DFP_INLINE_PLACEHOLDER),
+      '#default_value' => isset($values['inline_placeholder']) ? $values['inline_placeholder'] : '',
       '#description' => t('The pattern to use for manually inserted inline ad slot placeholders.'),
     );
-    $form['inline_settings']['inline_first_position'] = array(
+
+    $form['values']['inline_first_position'] = array(
       '#type' => 'select',
       '#title' => t('Automatically insert the first ad tag'),
       '#options' => array(
@@ -64,24 +60,24 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
       ),
       '#field_prefix' => t('Before the'),
       '#field_suffix' => t('paragraph or other block level element (media file, etc.)'),
-      '#default_value' => variable_get('dennis_dfp_inline_first_position', DENNIS_DFP_INLINE_FIRST_POSITION),
+      '#default_value' => isset($values['inline_first_position']) ? $values['inline_first_position'] : '' ,
       '#description' => t('The first ad slot should appear BEFORE the configured element. Please note that this only applies if there are no manually added placeholders in the content.'),
     );
-    $form['inline_settings']['inline_min_distance'] = array(
+    $form['values']['inline_min_distance'] = array(
       '#type' => 'select',
       '#title' => t('Minimum distance between subsequent ad slots in content'),
       '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
       '#field_suffix' => t('paragraph or other block level element (media file, etc.)'),
-      '#default_value' => variable_get('dennis_dfp_inline_min_distance', DENNIS_DFP_INLINE_MIN_DISTANCE),
+      '#default_value' => isset($values['inline_min_distance']) ? $values['inline_min_distance'] : '',
       '#description' => t('The minimum distance measured in paragraphs between the automated ad slot placements in content. If content is shorter then ads will be added to the end of the content.'),
     );
 
-    $form['inline_settings']['inline_max_num'] = array(
+    $form['values']['inline_max_num'] = array(
       '#type' => 'select',
       '#title' => t('Maximum number of placeholders in content'),
       '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
       '#field_suffix' => t('Maxium number of placeholders per node.'),
-      '#default_value' => variable_get('dennis_dfp_inline_max_number', DENNIS_DFP_INLINE_MAX_NUMBER),
+      '#default_value' => isset($values['inline_max_num']) ? $values['inline_max_num'] : '',
       '#description' => t('Maximum number of placeholders in content.'),
     );
 
@@ -130,14 +126,12 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
       if (!isset($context->reactions['dennis_dfp_inline'])) {
         continue;
       }
-//dpm($context->reactions['inline_body_placeholder']);
       foreach ($context->reactions['dennis_dfp_inline'] as $values) {
         if (!empty($values)) {
           $this->placeholder_config[$i] = $values;
         }
       }
     }
-//    dpm($this->placeholder_config);
   }
 }
 // @codingStandardsIgnoreEnd

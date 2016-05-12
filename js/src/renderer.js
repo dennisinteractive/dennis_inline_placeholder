@@ -1,3 +1,4 @@
+/* globals lazyLoadAdSlot */
 /**
  * Renderer module
  *
@@ -36,10 +37,6 @@ define([
       throw new Error('Configuration missing.');
     }
 
-    if (!settings.tags) {
-      throw new Error('There are no ad tags defined.');
-    }
-
     this.field = doc.querySelector(selector);
 
     if (!this.field) {
@@ -72,20 +69,8 @@ define([
         last = item[3];
 
         var tree = this.analyser.tree;
-        // Get the tag spec from settings.
-        var tagSpec = settings.tags.filter(function(val) {
-          return val[0] === tag;
-        });
         // Generate the wrapper element of the ad slot.
-        var $adWrapper = $('<div>', {
-          id: 'dfpinline-ad-' + tag + '-wrapper',
-          class: 'dfpinline-wrapper dfp-tag-wrapper ' + tagSpec[0][1].classes
-        });
-
-        $('<div>', {
-          id: 'dfp-ad-' + tag,
-          class: 'dfp-tag-wrapper'
-        }).appendTo($adWrapper);
+        var adSelector = settings.config.placeholder;
 
         // If position is set as last, make sure it is appended to the very end
         // to avoid mixing up ad order.
@@ -94,28 +79,12 @@ define([
         }
 
         // Add the final ad slot wrapper to the document fragment.
-        $(target, tree)[method]($adWrapper);
-        this.adsReady.push('dfp-ad-' + tag);
+        $(target, tree)[method](adSelector);
+        this.adsReady.push('dfp-ad-');
       }).bind(this)); // Function.prototype.bind to keep context.
 
       // Finally replace the original field contents with the new contents.
       ca.element.parentNode.replaceChild(ca.tree, ca.element);
-
-      return this;
-    },
-
-    /**
-     * Display DFP ads.
-     *
-     * @return {Object}
-     *   The instantiated object.
-     */
-    display: function() {
-      utils.each(this.adsReady, function(slot) {
-        googletag.cmd.push(function() {
-          googletag.display(slot);
-        });
-      });
 
       return this;
     },
@@ -131,13 +100,12 @@ define([
       var ca = this.analyser;
 
       // Process editorially added placeholders.
-      ca.processPlaceholders();
+      //ca.processPlaceholders();
       // Generate mapping info.
       ca.generateMapping();
 
       if (ca.mapping) {
         this.render();
-        this.display();
       }
 
       return this;

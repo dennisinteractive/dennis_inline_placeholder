@@ -7,7 +7,7 @@ define([
   'domReady!',
   'drupal',
   'utils'
-], function(doc, Drupal, utils, undefined) {
+], function(doc, Drupal, utils) {
 
   var config = Drupal.settings.dennisDfpInline.config;
   var pattern = new RegExp(config.placeholder, 'g');
@@ -53,7 +53,8 @@ define([
    */
   function ContentAnalyser(el) {
     this.element = el;
-    this.tags = Drupal.settings.dennisDfpInline.tags || [];
+    this.tags = Drupal.settings.dennisDfpInline.config.maxNumber;
+    this.inlineClass = Drupal.settings.dennisDfpInline.config.placeholder;
     this.placeholderTags = 0;
     this.tagsLeft = Object.keys(this.tags);
     this.mapping = [];
@@ -64,6 +65,7 @@ define([
   }
 
   ContentAnalyser.prototype = {
+
     /**
      * Search the content for editorially placed placeholders in the content.
      * If found, replace them with an element so they can later be replaced with
@@ -74,14 +76,14 @@ define([
      */
     processPlaceholders: function() {
       // Search for editorially inserted placeholders.
-      utils.each(this.content.match(pattern) || [], (function(match, key) {
-        if (this.tagsLeft.length > 0) {
+      utils.each(this.content.match(pattern), (function(match, key) {
+        if (this.tags.length > 0) {
           // Convert the current match to a pattern.
           var re = new RegExp(match);
           // Generate placeholder elements to replace of the HTML comment.
           var skel = doc.createElement('span');
           var el = doc.createElement('span');
-          var leftoverKey = this.tagsLeft.indexOf(key + ''); // Cast to string.
+          // var leftoverKey = this.tagsLeft.indexOf(key + ''); // Cast to string.
 
           el.id = 'dfpinline-placeholder-' + key;
           el.className = 'dfpinline-manual-placeholder';
@@ -91,7 +93,7 @@ define([
           this.content = this.content.replace(re, skel.innerHTML);
           this.placeholderTags++;
           // Remove the tag pointer just processed.
-          this.tagsLeft.splice(leftoverKey, 1);
+          // this.tagsLeft.splice(leftoverKey, 1);
         }
       }).bind(this)); // Function.prototype.bind to keep context.
 
@@ -124,13 +126,8 @@ define([
      *   The instantiated object.
      */
     generateMapping: function() {
-      // Return early if there is nothing to process.
-      if (this.placeholderTags === 0 && this.tagsLeft < 1) {
-        return [];
-      }
-
       // Generate mapping of any editorial placeholders.
-      this.generatePlaceholderMapping();
+      //this.generatePlaceholderMapping();
 
       // Generate mapping of any remaining placeholders.
       this.generateAutomatedMapping();
@@ -146,8 +143,8 @@ define([
      */
     generatePlaceholderMapping: function() {
       if (this.placeholderTags > 0) {
-        utils.each(this.tree.querySelectorAll('.dfpinline-manual-placeholder'), (function(item, key) {
-          this.mapping.push([item, 'replaceWith', this.tags[key][0]]);
+        utils.each(this.tree.querySelectorAll('.dfpinline-manual-placeholder'), (function(item) {
+          this.mapping.push([item, 'replaceWith', this.tags[0]]);
         }).bind(this)); // Function.prototype.bind to keep context.
       }
 
@@ -164,11 +161,6 @@ define([
      * too short paragraphs.
      */
     generateAutomatedMapping: function() {
-      // Return early if there isn't any tags left to process.
-      if (!this.tagsLeft) {
-        return this;
-      }
-
       // @todo Using the immediate child elements for the analysis. This could
       // do with a selector with predefined elements in the future.
       var children = this.tree.querySelector('*').children;
@@ -181,17 +173,7 @@ define([
       var hasManual;
       var last = false;
 
-      for (var key in this.tags) {
-        // Check if the tag is already placed manually.
-        if (this.tagsLeft.indexOf(key + '') === -1) {
-          // Get the position of the current manual added tag and use that for
-          // the calculation of the next position.
-          pos = parseInt(utils.getKeyByValue(children, this.mapping[key][0]));
-          i++;
-          hasManual = true;
-          continue;
-        }
-
+      for (var index=0; index<this.tags; index++) {
         // Calculate position.
         pos = (i++ === firstPosition) ? firstPosition : (pos + minDistance);
         // Inject before if manual placement has not happened yet.
@@ -202,7 +184,7 @@ define([
           method = 'after';
           last = true;
         }
-        this.mapping.push([children[pos], method, this.tags[key][0], last]);
+        this.mapping.push([children[pos], method, last]);
       }
 
       return this;

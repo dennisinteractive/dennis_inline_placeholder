@@ -3,6 +3,7 @@
  * @file
  * Dennis DFP Inline/Wysiwyg API integration.
  */
+define("DENNIS_DFP_INLINE_PLACEHOLDER", '<div class="inline-placeholder"/>');
 
 /**
  * Implements hook_wysiwyg_plugin().

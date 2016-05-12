@@ -13,6 +13,7 @@ function dennis_dfp_inline_uninstall() {
   variable_del('dennis_dfp_inline_placeholder');
   variable_del('dennis_dfp_inline_first_position');
   variable_del('dennis_dfp_inline_min_distance');
-  variable_del('dennis_dfp_inline_paragraph_length');
+  // variable_del('dennis_dfp_inline_paragraph_length');
   variable_del('dennis_dfp_inline_max_number');
+  variable_del('dennis_dfp_inline_paragraph');
 }

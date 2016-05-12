@@ -1,3 +1,4 @@
+/* global process */
 /**
  * @file
  * Grunt task definitions.
@@ -12,7 +13,8 @@ module.exports = function(grunt) {
       dist: {
         dirname: 'dfpinline',
         outfile: 'app'
-      }
+      },
+      distroPath: process.env.DISTRO_PATH
     },
 
     clean: {
@@ -41,10 +43,10 @@ module.exports = function(grunt) {
           baseUrl: 'js/src',
           paths: {
             dfpinline: '.',
-            domReady: '../../../../../libraries/domreadyjs/domReady',
-            has: '../../../../custom/dennis_js/js/has',
-            utils: '../../../../custom/dennis_js/js/utils',
-            support: '../../../../custom/dennis_js/js/support',
+            domReady: '<%= meta.distroPath %>/libraries/domreadyjs/domReady',
+            has: '<%= meta.distroPath %>/modules/custom/dennis_js/js/has',
+            utils: '<%= meta.distroPath %>/modules/custom/dennis_js/js/utils',
+            support: '<%= meta.distroPath %>/modules/custom/dennis_js/js/support',
 
             // Stub modules
             'jquery': 'empty:',
@@ -112,7 +114,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('post-build', [
     'clean:after',
-    'hashres',
+    // 'hashres',
     'bytesize'
   ]);
 
