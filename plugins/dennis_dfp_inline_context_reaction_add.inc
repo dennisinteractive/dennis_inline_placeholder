@@ -4,7 +4,6 @@
  * Context reaction plugin for DFP Inline rendering.
  */
 
-// @codingStandardsIgnoreStart
 /**
  * Expose DFP Inline Tags as context reactions.
  */
@@ -84,41 +83,6 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
     return $form;
   }
 
-  /**
-   * Options form submit handler.
-   */
-//  function options_form_submit($values) {
-//    foreach ($values['inline_tags'] as $name => $value) {
-//      // Do not include disabled elements.
-//      if (!$value['enabled']) {
-//        unset($values['inline_tags'][$name]);
-//      }
-//      // Remove enabled flag as we are storing enabled tags only.
-//      else {
-//        unset($values['inline_tags'][$name]['enabled']);
-//      }
-//    }
-//
-//    return $values;
-//  }
-
-  /**
-   * Check each currently set context for inline DFP ad slots.
-   */
-//  function execute() {
-//    foreach ($this->get_contexts() as $context_name => $context) {
-//      if (isset($context->reactions['dennis_dfp_inline'])) {
-//        foreach ($context->reactions['dennis_dfp_inline'] as $key => $value) {
-//          if (!empty($value)) {
-//            $this->$key = $value;
-//          }
-//        }
-//        break;
-//      }
-//    }
-//  }
-//}
-
   // Execute context.
   function execute() {
     $i = 0;
@@ -134,4 +98,3 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
     }
   }
 }
-// @codingStandardsIgnoreEnd
