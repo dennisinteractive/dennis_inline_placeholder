@@ -3,7 +3,7 @@
  * @file
  * dennis_dfp_inline.module
  */
-
+//define("DENNIS_DFP_INLINE_PLACEHOLDER", '<div class="dfpinline-manual-placeholder"></div>');
 /**
  * Implements hook_theme().
  */
@@ -62,7 +62,9 @@ function dennis_dfp_inline_get_configuration(){
 }
 
 function dennis_dfp_inline_page_build(){
+  // Get configuration from context
   $config = dennis_dfp_inline_get_configuration();
+  // Pass configuration to js
   _dennis_dfp_inline_load_js($config);
 }
 
@@ -77,18 +79,24 @@ function _dennis_dfp_inline_load_js($placeholders) {
 
   $config = array();
   // Add collected JS configuration.
-  if (!empty($placeholders)) {  
+  if (!empty($placeholders)) {
     $config['firstPosition'] = $placeholders['inline_first_position'];
     $config['placeholder'] = $placeholders['inline_placeholder'];
     $config['firstPosition'] = $placeholders['inline_first_position'];
     $config['minDistance'] = $placeholders['inline_min_distance'];
     $config['maxNumber'] = $placeholders['inline_max_num'];
     $config['selector'] = $placeholders['inline_selector'];
-    // TODO: add min paragrahp length to context
-    // $config['minParaLength'] = $placeholders['inline_paragraph'];
+    $config['minimum'] = $placeholders['minimum'];
+    $config['lastAdPosition'] = $placeholders['inline_place_lasst'];
 
     // context settings now accessible from Drupal.settings.inlineBodyPlaceholder.placeholders
     drupal_add_js(array('dennisDfpInline' => array('config' => $config)), 'setting');
+
+//  if (module_exists('dennis_dfp_inline_wysiwyg')) {
+//    $inline_placeholder = variable_get('dennis_dfp_inline_placeholder', DENNIS_DFP_INLINE_PLACEHOLDER);
+//    drupal_add_js(array('dennisDfpInline' => array('wysiwyg' => $inline_placeholder)), 'setting');
+//  }
+
   }
 
   // Production mode extras.

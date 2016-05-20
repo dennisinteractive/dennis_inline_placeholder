@@ -150,8 +150,9 @@ ContentAnalyser.prototype = {
   generateAutomatedMapping: function() {
     // @todo Using the immediate child elements for the analysis. This could
     // do with a selector with predefined elements in the future.
-    var children = this.tree.querySelector('*').children;
-
+    //var children = this.tree.querySelector('*').children;
+    // We grab all paragraphs (p tags).
+    var pTags = this.tree.querySelectorAll('p');
     var minDistance = (this.config && parseInt(this.config.minDistance)) || 2;
     var firstPosition = ((this.config && parseInt(this.config.firstPosition)) || 1) - 1;
     var pos = 0;
@@ -159,19 +160,33 @@ ContentAnalyser.prototype = {
     var method;
     var hasManual;
     var last = false;
-
-    for ( var index = 0; index < this.tags; index++ ) {
+    var maxNumber = this.tags;
+    var numTags = 0;
+    var minWordCount = parseInt(this.config['minimum']['inline_total_words']);
+    var minWordCountAdNumber = parseInt(this.config['minimum']['inline_max_num_if_words']);
+    var lastAdPosition = parseInt(this.config['lastAdPosition']);
+    //We want to count the amount of words in an article.
+    var wordCount = 0;
+    for (var i = 0; i < pTags.length; i++) {
+      wordCount += pTags[i].innerText.split(' ').length;
+    }
+    // Requirement: if less than minWordCount words only show minWordCountAdNumber ads.
+    if (wordCount < minWordCount) {
+      var maxNumber = minWordCountAdNumber;
+    }
+    // We loop as many times as max tags per page.
+    for (var index = 0; index < maxNumber; index++) {
       // Calculate position.
       pos = ( i++ === firstPosition ) ? firstPosition : ( pos + minDistance );
       // Inject before if manual placement has not happened yet.
       method = hasManual ? 'after' : 'before';
-      // If currently calculated position is too far, stick the ad at the end.
-      if (pos > children.length - 1) {
-        pos = children.length -1;
-        method = 'after';
+      // Place last ad before the lastAdPosition paragraph.
+      if (index == (maxNumber - 1)) {
+        pos = pTags.length - lastAdPosition;
+        method = 'before';
         last = true;
       }
-      this.mapping.push( [children[pos], method, last] );
+      this.mapping.push([pTags[pos], method, last]);
     }
 
     return this;

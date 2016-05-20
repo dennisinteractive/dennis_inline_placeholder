@@ -18,5 +18,6 @@ function dennis_dfp_inline_wysiwyg_dfpinline_plugin() {
     ),
   );
 
+
   return $plugins;
 }

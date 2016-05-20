@@ -18,7 +18,6 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
     $values = [];
     $form = [];
     // Get existing values for this form.
-
     $settings = $this->fetch_from_context($context);
 
 
@@ -58,7 +57,7 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
         5 => t('fifth'),
       ),
       '#field_prefix' => t('Before the'),
-      '#field_suffix' => t('paragraph or other block level element (media file, etc.)'),
+      '#field_suffix' => t('paragraph'),
       '#default_value' => isset($values['inline_first_position']) ? $values['inline_first_position'] : '' ,
       '#description' => t('The first ad slot should appear BEFORE the configured element. Please note that this only applies if there are no manually added placeholders in the content.'),
     );
@@ -66,7 +65,7 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
       '#type' => 'select',
       '#title' => t('Minimum distance between subsequent ad slots in content'),
       '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
-      '#field_suffix' => t('paragraph or other block level element (media file, etc.)'),
+      '#field_suffix' => t('paragraph'),
       '#default_value' => isset($values['inline_min_distance']) ? $values['inline_min_distance'] : '',
       '#description' => t('The minimum distance measured in paragraphs between the automated ad slot placements in content. If content is shorter then ads will be added to the end of the content.'),
     );
@@ -74,10 +73,53 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
     $form['values']['inline_max_num'] = array(
       '#type' => 'select',
       '#title' => t('Maximum number of placeholders in content'),
-      '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
-      '#field_suffix' => t('Maxium number of placeholders per node.'),
+      '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8,9 ,10)),
+      '#field_suffix' => t('Maxium number of placeholders per article body.'),
       '#default_value' => isset($values['inline_max_num']) ? $values['inline_max_num'] : '',
       '#description' => t('Maximum number of placeholders in content.'),
+    );
+     $form['values']['minimum'] = array(
+       '#type' => 'fieldset',
+       '#title' => t('Mininum Settings'),
+       '#description' => t('The following settings control the maximum number of ads depending on number of words.'),
+       '#group' => 'settings',
+       '#collapsible' => TRUE,
+       '#collapsed' => TRUE,
+     );
+     $form['values']['minimum']['inline_total_words'] = array(
+       '#type' => 'textfield',
+       '#title' => t('Mininum number of words'),
+       '#size' => 5,
+       '#field_suffix' => t('Mininum number of words in an article for setting below.'),
+       '#default_value' => isset($values['minimum']['inline_total_words']) ? $values['minimum']['inline_total_words'] : '',
+       '#description' => t('Mininum number of words.'),
+     );
+
+     $form['values']['minimum']['inline_max_num_if_words'] = array(
+       '#type' => 'select',
+       '#title' => t('Maximum number of placeholders.'),
+       '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
+       '#field_suffix' => t('Maxium number of placeholders per node if number of words above.'),
+       '#default_value' => isset($values['minimum']['inline_max_num_if_words']) ? $values['minimum']['inline_max_num_if_words'] : '',
+       '#description' => t('Maximum number of placeholders in content.'),
+     );
+
+
+
+    $form['values']['inline_place_lasst'] = array(
+      '#type' => 'select',
+      '#title' => t('Last placeholder position'),
+      '#options' => array(
+        1 => t('first'),
+        2 => t('second'),
+        3 => t('third'),
+        4 => t('fourth'),
+        5 => t('fifth'),
+      ),
+      '#field_prefix' => t('Before the'),
+      '#field_suffix' => t('paragraph'),
+      '#default_value' => isset($values['inline_place_lasst']) ? $values['inline_place_lasst'] : '' ,
+      '#description' => t('Place last ad before the following paragraph.'),
     );
 
     return $form;

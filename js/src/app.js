@@ -12,9 +12,9 @@ var dennisDfpInline = dennisDfpInline || {};
 var Renderer;
 
 (function () {
-  Drupal.behaviors.exampleModule = {
+  Drupal.behaviors.dennisDfpInline = {
     attach: function( context, settings ) {
-      
+
       if ( window.googletag &&
           Drupal.settings.dennisDfpInline &&
           Drupal.settings.dennisDfpInline.config &&
