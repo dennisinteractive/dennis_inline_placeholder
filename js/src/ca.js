@@ -46,10 +46,10 @@ function ContentAnalyser(el, settings) {
   this.pattern = new RegExp(this.config.placeholder, 'g');
 
   this.element = el;
-  this.tags = this.config.maxNumber;
+  this.tags = [];
   this.inlineClass = this.config.placeholder;
   this.placeholderTags = 0;
-  this.tagsLeft = Object.keys(this.tags);
+  this.tagsLeftCount = this.config.maxNumber;
   this.mapping = [];
 
   this.tree = document.createDocumentFragment();
@@ -61,16 +61,17 @@ ContentAnalyser.prototype = {
 
   /**
    * Search the content for editorially placed placeholders in the content.
-   * If found, replace them with an element so they can later be replaced with
-   * actual ad slots.
+   * Replaces them with a different one  so they are ignored when placing the automatic ones.
+   * It can later be replaced with actual ad slots.
    *
    * @return {Object}
    *   The instantiated object.
    */
   processPlaceholders: function() {
-    // Search for editorially inserted placeholders.
-    this.utilseach(this.content.match(this.pattern), (function(match, key) {
-      if (this.tags.length > 0) {
+    var match = this.content.match(this.pattern);
+
+    this.utilseach(this.content.match(this.pattern) || [], (function(match, key) {
+      if (this.tagsLeftCount > 0) {
         // Convert the current match to a pattern.
         var re = new RegExp(match);
         // Generate placeholder elements to replace of the HTML comment.
@@ -84,6 +85,7 @@ ContentAnalyser.prototype = {
         // Replace the match with the placeholder element.
         this.content = this.content.replace(re, skel.innerHTML);
         this.placeholderTags++;
+        this.tagsLeftCount--;
       }
     }).bind(this)); // Function.prototype.bind to keep context.
 
@@ -116,6 +118,13 @@ ContentAnalyser.prototype = {
    *   The instantiated object.
    */
   generateMapping: function() {
+    // Return early if there is nothing to process.
+    if (this.placeholderTags === 0 && this.tagsLeft < 1) {
+      return [];
+    }
+
+    // Generate mapping of any editorial placeholders.
+    this.generatePlaceholderMapping();
     // Generate mapping of any remaining placeholders.
     this.generateAutomatedMapping();
 
@@ -130,8 +139,8 @@ ContentAnalyser.prototype = {
    */
   generatePlaceholderMapping: function() {
     if (this.placeholderTags > 0) {
-      this.utilseach(this.tree.querySelectorAll('.dfpinline-manual-placeholder'), (function(item) {
-        this.mapping.push([item, 'replaceWith', this.tags[0]]);
+      this.utilseach(this.tree.querySelectorAll('.dfpinline-manual-placeholder'), (function(item, key) {
+      this.mapping.push([item, 'replaceWith', this.pattern]);
       }).bind(this)); // Function.prototype.bind to keep context.
     }
 
@@ -148,11 +157,10 @@ ContentAnalyser.prototype = {
    * too short paragraphs.
    */
   generateAutomatedMapping: function() {
-    // @todo Using the immediate child elements for the analysis. This could
-    // do with a selector with predefined elements in the future.
-    //var children = this.tree.querySelector('*').children;
     // We grab all paragraphs (p tags).
-    var pTags = this.tree.querySelectorAll('p');
+    if (this.tagsLeftCount < 1) {
+      return this;
+    }
     var minDistance = (this.config && parseInt(this.config.minDistance)) || 2;
     var firstPosition = ((this.config && parseInt(this.config.firstPosition)) || 1) - 1;
     var pos = 0;
@@ -167,6 +175,13 @@ ContentAnalyser.prototype = {
     var lastAdPosition = parseInt(this.config['lastAdPosition']);
     //We want to count the amount of words in an article.
     var wordCount = 0;
+
+
+    // We select all p tags that are not empty.
+    var pTags = this.tree.querySelectorAll('p:not(:empty)');
+    // We still have to clean if they have html but no text.
+    pTags = this.removeEmptyParagraphs(pTags);
+
     for (var i = 0; i < pTags.length; i++) {
       wordCount += pTags[i].innerText.split(' ').length;
     }
@@ -174,21 +189,37 @@ ContentAnalyser.prototype = {
     if (wordCount < minWordCount) {
       var maxNumber = minWordCountAdNumber;
     }
+
+    // If we have manual placeholders we'll move the next ones forward.
+    // Ex: If we have 1 manual placeholder, the automatic will ignore the 1st automatic.
+
+    if(this.placeholderTags>0){
+      firstPosition = firstPosition + (this.placeholderTags * minDistance);
+    }
+
     // We loop as many times as max tags per page.
-    for (var index = 0; index < maxNumber; index++) {
-      // Calculate position.
-      pos = ( i++ === firstPosition ) ? firstPosition : ( pos + minDistance );
-      // Inject before if manual placement has not happened yet.
-      method = hasManual ? 'after' : 'before';
-      // Place last ad before the lastAdPosition paragraph.
-      if (index == (maxNumber - 1)) {
+    for (var index = 0; index < this.tagsLeftCount; index++) {
+      // Insert method. After the selected paragraph.
+      method = 'after';
+      if( index ===0 ){
+        pos = firstPosition;
+      }
+      else{
+       pos =  pos + minDistance
+      }
+      // Place last ad before the lastAdPosition paragraph if that option is enabled.
+      if (this.config['lastAdPositionEnabled'] == 1 && index == (this.tagsLeftCount - 1)) {
         pos = pTags.length - lastAdPosition;
         method = 'before';
         last = true;
       }
+      // If we get to the end of the article don't add more even if we didn't reach the maximum of ads set.
+      if (pos > pTags.length - 1) {
+        last = true;
+        continue;
+      }
       this.mapping.push([pTags[pos], method, last]);
     }
-
     return this;
   },
 
@@ -203,6 +234,24 @@ ContentAnalyser.prototype = {
         break; //allow early exit
       }
     }
-  }
-
+  },
+  /**
+   *
+   * @param pTags
+   * @returns {Array}
+     */
+  removeEmptyParagraphs: function(pTags){
+  // We create a new array where to place the p tags that have no empty html tags inside.
+  var newPTags = [];
+    for(var i=pTags.length-1; i>=0; i--) {
+      // If it's not an empty p tag (no text or empty html tag)
+      if (pTags[i].textContent) {
+        // We push it to our new pTags array.
+        newPTags.push(pTags[i]);
+      }
+    }
+    // We reverse the array to make it
+    newPTags.reverse();
+    return newPTags;
+  },
 };

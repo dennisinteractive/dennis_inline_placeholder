@@ -91,7 +91,7 @@ Renderer.prototype = {
     var ca = this.analyser;
 
     // Process editorially added placeholders.
-    //ca.processPlaceholders();
+    ca.processPlaceholders();
     // Generate mapping info.
     ca.generateMapping();
 
