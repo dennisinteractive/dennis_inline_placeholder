@@ -146,7 +146,7 @@ ContentAnalyser.prototype = {
     if (this.placeholderTags > 0) {
       // we select all the manual placeholders, with their temporary state to identify
       // and replace with the context generated placeholder.
-      this.utilseach(this.tree.querySelectorAll('.dfpinline-manual-placeholder'), (function(item, key) {
+      this.utilseach(this.tree.querySelectorAll('.dfpinline-manual-placeholder'), (function(item) {
       this.mapping.push([item, 'replaceWith', this.pattern]);
       }).bind(this)); // Function.prototype.bind to keep context.
     }
@@ -171,15 +171,12 @@ ContentAnalyser.prototype = {
     var minDistance = (this.config && parseInt(this.config.minDistance)) || 2;
     var firstPosition = ((this.config && parseInt(this.config.firstPosition)) || 1) - 1;
     var pos = 0;
-    var i = firstPosition;
     var method;
-    var hasManual;
     var last = false;
     var maxNumber = this.tags;
-    var numTags = 0;
-    var minWordCount = parseInt(this.config['minimum']['inline_total_words']);
-    var minWordCountAdNumber = parseInt(this.config['minimum']['inline_max_num_if_words']);
-    var lastAdPosition = parseInt(this.config['lastAdPosition']);
+    var minWordCount = parseInt(this.config.minimum.inline_total_words);
+    var minWordCountAdNumber = parseInt(this.config.minimum.inline_max_num_if_words);
+    var lastAdPosition = parseInt(this.config.lastAdPosition);
     //We want to count the amount of words in an article.
     var wordCount = 0;
 
@@ -189,12 +186,12 @@ ContentAnalyser.prototype = {
     // We still have to clean if they have html but no text.
     pTags = this.removeEmptyParagraphs(pTags);
 
-    for (var i = 0; i < pTags.length; i++) {
-      wordCount += pTags[i].innerText.split(' ').length;
+    for (var j = 0; j < pTags.length; j++) {
+      wordCount += pTags[j].innerText.split(' ').length;
     }
     // Requirement: if less than minWordCount words only show minWordCountAdNumber ads.
     if (wordCount < minWordCount) {
-      var maxNumber = minWordCountAdNumber;
+      maxNumber = minWordCountAdNumber;
     }
 
     // If we have manual placeholders we'll move the next ones forward.
@@ -212,10 +209,10 @@ ContentAnalyser.prototype = {
         pos = firstPosition;
       }
       else{
-       pos =  pos + minDistance
+       pos =  pos + minDistance;
       }
       // Place last ad before the lastAdPosition paragraph if that option is enabled.
-      if (this.config['lastAdPositionEnabled'] == 1 && index == (this.tagsLeftCount - 1)) {
+      if (this.config.lastAdPositionEnabled === 1 && index === (this.tagsLeftCount - 1)) {
         pos = pTags.length - lastAdPosition;
         method = 'before';
         last = true;
