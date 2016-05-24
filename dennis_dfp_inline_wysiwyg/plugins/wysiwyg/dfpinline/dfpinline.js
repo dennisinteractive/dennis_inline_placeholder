@@ -24,8 +24,10 @@
       var divPlaceholder = settings.dfpInlinePattern;
       // Get image placeholder.
       var imgPlaceholder = this._getPlaceholder(settings);
-      // Replace inline placeholder with image placeholder for viewing in wysiwyg
-      content = content.replace(divPlaceholder, imgPlaceholder);
+      // Convert to regex ,find all (param g).
+      var pattern = new RegExp(divPlaceholder, 'g');
+      // Replace inline placeholders with image placeholders for viewing in wysiwyg
+      content = content.replace(pattern, imgPlaceholder);
       return content;
     },
     /**

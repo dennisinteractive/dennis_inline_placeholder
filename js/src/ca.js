@@ -68,9 +68,14 @@ ContentAnalyser.prototype = {
    *   The instantiated object.
    */
   processPlaceholders: function() {
-    var match = this.content.match(this.pattern);
 
-    this.utilseach(this.content.match(this.pattern) || [], (function(match, key) {
+    // we'll target the manually placed placeholders
+    // replacing them temporally by dfpinline-manual-placeholder class
+    // to replace them again with the final customized in context placeholder.
+    var manualPlaceholder = new RegExp('<div class="dfpinline-auto-placeholder"></div>', 'g');
+    var match = this.content.match(manualPlaceholder);
+
+    this.utilseach(match || [], (function(match, key) {
       if (this.tagsLeftCount > 0) {
         // Convert the current match to a pattern.
         var re = new RegExp(match);
@@ -139,6 +144,8 @@ ContentAnalyser.prototype = {
    */
   generatePlaceholderMapping: function() {
     if (this.placeholderTags > 0) {
+      // we select all the manual placeholders, with their temporary state to identify
+      // and replace with the context generated placeholder.
       this.utilseach(this.tree.querySelectorAll('.dfpinline-manual-placeholder'), (function(item, key) {
       this.mapping.push([item, 'replaceWith', this.pattern]);
       }).bind(this)); // Function.prototype.bind to keep context.
