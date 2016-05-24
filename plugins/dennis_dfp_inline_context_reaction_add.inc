@@ -50,13 +50,13 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
       '#type' => 'select',
       '#title' => t('Automatically insert the first ad tag'),
       '#options' => array(
-        1 => t('first'),
-        2 => t('second'),
-        3 => t('third'),
-        4 => t('fourth'),
-        5 => t('fifth'),
+        0 => t('first'),
+        1 => t('second'),
+        2 => t('third'),
+        3 => t('fourth'),
+        4 => t('fifth'),
       ),
-      '#field_prefix' => t('Before the'),
+      '#field_prefix' => t('After  the'),
       '#field_suffix' => t('paragraph'),
       '#default_value' => isset($values['inline_first_position']) ? $values['inline_first_position'] : '' ,
       '#description' => t('The first ad slot should appear BEFORE the configured element. Please note that this only applies if there are no manually added placeholders in the content.'),
@@ -105,8 +105,14 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
      );
 
 
+    $form['values']['inline_place_last_enabled'] = array(
+      '#title' => t('Last Position Configuration Enabled'),
+      '#type' => 'checkbox',
+      '#description' => t('Turn on if you want the last position to be placed in the place underneath.'),
+      '#default_value' => isset($values['inline_place_last_enabled']) ? $values['inline_place_last_enabled'] : 0,
+    );
 
-    $form['values']['inline_place_lasst'] = array(
+    $form['values']['inline_place_last'] = array(
       '#type' => 'select',
       '#title' => t('Last placeholder position'),
       '#options' => array(
@@ -117,7 +123,7 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
         5 => t('fifth'),
       ),
       '#field_prefix' => t('Before the'),
-      '#field_suffix' => t('paragraph'),
+      '#field_suffix' => t('paragraph from the end.'),
       '#default_value' => isset($values['inline_place_lasst']) ? $values['inline_place_lasst'] : '' ,
       '#description' => t('Place last ad before the following paragraph.'),
     );

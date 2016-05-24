@@ -87,7 +87,8 @@ function _dennis_dfp_inline_load_js($placeholders) {
     $config['maxNumber'] = $placeholders['inline_max_num'];
     $config['selector'] = $placeholders['inline_selector'];
     $config['minimum'] = $placeholders['minimum'];
-    $config['lastAdPosition'] = $placeholders['inline_place_lasst'];
+    $config['lastAdPosition'] = $placeholders['inline_place_last'];
+    $config['lastAdPositionEnabled'] = $placeholders['inline_place_last_enabled'];
 
     // context settings now accessible from Drupal.settings.inlineBodyPlaceholder.placeholders
     drupal_add_js(array('dennisDfpInline' => array('config' => $config)), 'setting');
