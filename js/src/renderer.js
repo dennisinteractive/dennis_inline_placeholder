@@ -21,6 +21,7 @@
  *   Ad slots ready to render.
  */
 var ContentAnalyser;
+var Renderer;
 
 function Renderer(selector, settings) {
   if (!settings || !settings.config) {

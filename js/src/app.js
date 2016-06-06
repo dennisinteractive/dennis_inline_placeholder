@@ -1,3 +1,4 @@
+/* globals Renderer: false;
 /**
  * @module dfpinline/app
  *
@@ -9,7 +10,6 @@
  */
 
 var dennisDfpInline = dennisDfpInline || {};
-var Renderer;
 
 (function () {
   Drupal.behaviors.dennisDfpInline = {
