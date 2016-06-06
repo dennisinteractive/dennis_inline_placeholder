@@ -11,7 +11,6 @@ module.exports = function(grunt) {
 
     meta: {
       dist: {
-        dirname: 'dfpinline',
         outfile: 'app'
       },
       distroPath: process.env.DISTRO_PATH
@@ -21,9 +20,9 @@ module.exports = function(grunt) {
       before: ['js/dist'],
       after: [
         'js/dist/**/*',                                                   // Clean everything in js/dist.
-        '!js/dist/<%= meta.dist.dirname %>/**',                           // Except the dfpinline folder.
-        'js/dist/<%= meta.dist.dirname %>/*',                             // Then clean everything inside dfpinline folder.
-        '!js/dist/<%= meta.dist.dirname %>/<%= meta.dist.outfile %>.js',  // Except our precious optimised bundle.
+        '!js/dist/**',                           // Except the dfpinline folder.
+        'js/dist/*',                             // Then clean everything inside dfpinline folder.
+        '!js/dist/<%= meta.dist.outfile %>.js',  // Except our precious optimised bundle.
         '!js/dist/build.txt'                                              // Keep build.txt for future reference.
       ]
     },
@@ -55,7 +54,7 @@ module.exports = function(grunt) {
             'googletag': 'empty:'
           },
           modules: [
-            { name: '<%= meta.dist.dirname %>/<%= meta.dist.outfile %>' }
+            { name: '<%= meta.dist.outfile %>' }
           ],
 
           dir: 'js/dist',
@@ -74,14 +73,14 @@ module.exports = function(grunt) {
         fileNameFormat: '${name}.${hash}.${ext}',
       },
       dist: {
-        src: ['js/dist/<%= meta.dist.dirname %>/<%= meta.dist.outfile %>.js'],
+        src: ['js/dist/<%= meta.dist.outfile %>.js'],
         dest: []
       }
     },
 
     bytesize: {
       dist: {
-        src: ['js/dist/<%= meta.dist.dirname %>/<%= meta.dist.outfile %>*.js']
+        src: ['js/dist/<%= meta.dist.outfile %>*.js']
       }
     },
 
