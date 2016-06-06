@@ -17,14 +17,7 @@ module.exports = function(grunt) {
     },
 
     clean: {
-      before: ['js/dist'],
-      after: [
-        'js/dist/**/*',                                                   // Clean everything in js/dist.
-        '!js/dist/**',                           // Except the dfpinline folder.
-        'js/dist/*',                             // Then clean everything inside dfpinline folder.
-        '!js/dist/<%= meta.dist.outfile %>.js',  // Except our precious optimised bundle.
-        '!js/dist/build.txt'                                              // Keep build.txt for future reference.
-      ]
+      before: ['js/dist/**/*']
     },
 
     jshint: {
@@ -75,7 +68,6 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('post-build', [
-    'clean:after',
     // 'hashres',
     'bytesize'
   ]);
