@@ -29,15 +29,18 @@ module.exports = function(grunt) {
       dist: ['Gruntfile.js', 'js/**/*.js']
     },
 
+    concat: {
       dist: {
-        src: ['js/dist/<%= meta.dist.outfile %>.js'],
-        dest: []
-      }
+        src: ['js/src/app.js', 'js/src/ca.js', 'js/src/renderer.js'],
+        dest: 'js/dist/<%= meta.dist.outfile %>.js',
+      },
     },
 
-    bytesize: {
+    uglify: {
       dist: {
-        src: ['js/dist/<%= meta.dist.outfile %>*.js']
+        files: {
+          'js/dist/<%= meta.dist.outfile %>.js': ['js/dist/<%= meta.dist.outfile %>.js']
+        }
       }
     },
 
@@ -51,9 +54,10 @@ module.exports = function(grunt) {
   });
 
   // Load plugins.
-  grunt.loadNpmTasks('grunt-bytesize');
+  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-hashres');
 
@@ -64,12 +68,11 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('build', [
-    'requirejs',
+    'concat',
   ]);
 
   grunt.registerTask('post-build', [
-    // 'hashres',
-    'bytesize'
+    'uglify'
   ]);
 
   grunt.registerTask('do-build', [
