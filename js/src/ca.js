@@ -180,10 +180,16 @@ ContentAnalyser.prototype = {
     //We want to count the amount of words in an article.
     var wordCount = 0;
 
+    // We select all <p> tags inside this.tree and create an array of them.
+    var pTags = [];
 
-    // We select all p tags that are not empty.
-    var pTags = this.tree.querySelectorAll('p:not(:empty)');
-    // We still have to clean if they have html but no text.
+    [].slice.call( this.tree.childNodes[0].childNodes ).forEach(function( node ) {
+      if (node.nodeName === 'P') {
+        pTags.push(node);
+      }
+    });
+    
+    // Then we clean out the empty ones (if they have html but no text).
     pTags = this.removeEmptyParagraphs(pTags);
 
     for (var j = 0; j < pTags.length; j++) {
