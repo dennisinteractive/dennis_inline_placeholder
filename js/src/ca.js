@@ -203,7 +203,7 @@ ContentAnalyser.prototype = {
     // If we have manual placeholders we'll move the next ones forward.
     // Ex: If we have 1 manual placeholder, the automatic will ignore the 1st automatic.
 
-    if(this.placeholderTags>0){
+    if(this.placeholderTags > 0){
       firstPosition = firstPosition + (this.placeholderTags * minDistance);
     }
 
@@ -251,9 +251,9 @@ ContentAnalyser.prototype = {
    * @returns {Array}
      */
   removeEmptyParagraphs: function(pTags){
-  // We create a new array where to place the p tags that have no empty html tags inside.
-  var newPTags = [];
-    for(var i=pTags.length-1; i>=0; i--) {
+    // We create a new array where to place the p tags that have no empty html tags inside.
+    var newPTags = [];
+    for(var i = pTags.length - 1; i >= 0; i--) {
       // If it's not an empty p tag (no text or empty html tag)
       if (pTags[i].textContent) {
         // We push it to our new pTags array.
