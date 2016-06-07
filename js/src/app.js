@@ -1,3 +1,4 @@
+/* globals Renderer: false;
 /**
  * @module dfpinline/app
  *
@@ -7,35 +8,21 @@
  *
  * @module dfpinline/app
  */
-define([
-  'drupal',
-  'dfpinline/renderer',
-  'has',
-], function(Drupal, Renderer) {
 
-  var app = {
-    init: function() {
-      var r = false;
+var dennisDfpInline = dennisDfpInline || {};
 
-      try {
-        r = new Renderer(Drupal.settings.dennisDfpInline.config.selector);
-        r.field && r.init();
+(function () {
+  Drupal.behaviors.dennisDfpInline = {
+    attach: function( context, settings ) {
+
+      if ( window.googletag &&
+          Drupal.settings.dennisDfpInline &&
+          Drupal.settings.dennisDfpInline.config &&
+          Drupal.settings.dennisDfpInline.config.selector
+        ) {
+        var r = new Renderer( settings.dennisDfpInline.config.selector, settings.dennisDfpInline );
+            r.field && r.init();
       }
-      catch(err) {
-        throw new Error('[dfpinline] Renderer failed to instantiate: ' + err.message);
-      }
-
-      return r;
     }
   };
-
-  return {
-    init: function() {
-      return !!(window.googletag &&
-        Drupal.settings.dennisDfpInline &&
-        Drupal.settings.dennisDfpInline.config &&
-        Drupal.settings.dennisDfpInline.config.selector &&
-        app.init());
-    }
-  };
-});
+})();

@@ -1,0 +1,109 @@
+<?php
+/**
+ * @file
+ * dennis_inline_placeholder.module
+ */
+//define("dennis_inline_placeholder_PLACEHOLDER", '<div class="dfpinline-manual-placeholder"></div>');
+/**
+ * Implements hook_theme().
+ */
+function dennis_inline_placeholder_theme() {
+  return array(
+    'dennis_inline_placeholder_context_form' => array(
+      'render element' => 'form',
+    ),
+  );
+}
+
+/**
+ * Implements hook_context_registry().
+ */
+function dennis_inline_placeholder_context_registry() {
+  return array(
+    'reactions' => array(
+      'dennis_inline_placeholder' => array(
+        'title' => t('Dennis Inline Placeholder'),
+        'plugin' => 'dennis_inline_placeholder',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_context_plugins().
+ */
+function dennis_inline_placeholder_context_plugins() {
+  $plugins = array();
+  $plugins['dennis_inline_placeholder'] = array(
+    'handler' => array(
+      'path' => drupal_get_path('module', 'dennis_inline_placeholder') . '/plugins',
+      'file' => 'dennis_inline_placeholder_context_reaction_add.inc',
+      'class' => 'dennis_inline_placeholder_context_reaction_add',
+      'parent' => 'context_reaction',
+    ),
+  );
+
+  return $plugins;
+}
+
+function dennis_inline_placeholder_get_configuration(){
+  $config = array();
+
+  // Execute lazyadslot plugin.
+  if ($plugin = context_get_plugin('reaction', 'dennis_inline_placeholder')) {
+    $plugin->execute();
+    foreach ($plugin->placeholder_config as $values) {
+      $config = $values;
+
+    }
+  }
+
+  return $config;
+}
+
+function dennis_inline_placeholder_page_build(){
+  // Get configuration from context
+  $config = dennis_inline_placeholder_get_configuration();
+  // Pass configuration to js
+  _dennis_inline_placeholder_load_js($config);
+}
+
+/**
+ * Load the JS application via require.
+ */
+function _dennis_inline_placeholder_load_js($placeholders) {
+
+  $js_devel = variable_get('dennis_js_devel', FALSE);
+  $subfolder = ($js_devel) ? 'src' : 'dist';
+  $path = drupal_get_path('module', 'dennis_inline_placeholder') . '/js/' . $subfolder;
+
+  $config = array();
+  // Add collected JS configuration.
+  if (!empty($placeholders)) {
+    $config['firstPosition'] = $placeholders['inline_first_position'];
+    $config['placeholder'] = $placeholders['inline_placeholder'];
+    $config['firstPosition'] = $placeholders['inline_first_position'];
+    $config['minDistance'] = $placeholders['inline_min_distance'];
+    $config['maxNumber'] = $placeholders['inline_max_num'];
+    $config['selector'] = $placeholders['inline_selector'];
+    $config['minimum'] = $placeholders['minimum'];
+    $config['lastAdPosition'] = $placeholders['inline_place_last'];
+    $config['lastAdPositionEnabled'] = $placeholders['inline_place_last_enabled'];
+
+    // context settings now accessible from Drupal.settings.inlineBodyPlaceholder.placeholders
+    drupal_add_js(array('dennisDfpInline' => array('config' => $config)), 'setting');
+
+//  if (module_exists('dennis_inline_placeholder_wysiwyg')) {
+//    $inline_placeholder = variable_get('dennis_inline_placeholder_placeholder', dennis_inline_placeholder_PLACEHOLDER);
+//    drupal_add_js(array('dennisDfpInline' => array('wysiwyg' => $inline_placeholder)), 'setting');
+//  }
+
+  }
+
+  // Production mode extras.
+  if ($js_devel) {
+    drupal_add_js($path . '/ca.js');
+    drupal_add_js($path . '/renderer.js');
+  }
+  drupal_add_js($path . '/app.js');
+}

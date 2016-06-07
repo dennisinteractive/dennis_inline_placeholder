@@ -1,3 +1,4 @@
+/* global process */
 /**
  * @file
  * Grunt task definitions.
@@ -10,20 +11,13 @@ module.exports = function(grunt) {
 
     meta: {
       dist: {
-        dirname: 'dfpinline',
         outfile: 'app'
-      }
+      },
+      distroPath: process.env.DISTRO_PATH
     },
 
     clean: {
-      before: ['js/dist'],
-      after: [
-        'js/dist/**/*',                                                   // Clean everything in js/dist.
-        '!js/dist/<%= meta.dist.dirname %>/**',                           // Except the dfpinline folder.
-        'js/dist/<%= meta.dist.dirname %>/*',                             // Then clean everything inside dfpinline folder.
-        '!js/dist/<%= meta.dist.dirname %>/<%= meta.dist.outfile %>.js',  // Except our precious optimised bundle.
-        '!js/dist/build.txt'                                              // Keep build.txt for future reference.
-      ]
+      before: ['js/dist/**/*']
     },
 
     jshint: {
@@ -35,51 +29,18 @@ module.exports = function(grunt) {
       dist: ['Gruntfile.js', 'js/**/*.js']
     },
 
-    requirejs: {
-      compile: {
-        options: {
-          baseUrl: 'js/src',
-          paths: {
-            dfpinline: '.',
-            domReady: '../../../../../libraries/domreadyjs/domReady',
-            has: '../../../../custom/dennis_js/js/has',
-            utils: '../../../../custom/dennis_js/js/utils',
-            support: '../../../../custom/dennis_js/js/support',
-
-            // Stub modules
-            'jquery': 'empty:',
-            'jquery.once': 'empty:',
-            'drupal': 'empty:',
-            'googletag': 'empty:'
-          },
-          modules: [
-            { name: '<%= meta.dist.dirname %>/<%= meta.dist.outfile %>' }
-          ],
-
-          dir: 'js/dist',
-          enforceDefine: false,
-          findNestedDependencies: true,
-          preserveLicenseComments: false,
-          generateSourceMaps: false,
-          optimize: 'uglify2' // 'uglify2' or 'none'
-        }
-      }
-    },
-
-    hashres: {
-      options: {
-        // This filename format is looked up in _dennis_js_get_dist_path().
-        fileNameFormat: '${name}.${hash}.${ext}',
+    concat: {
+      dist: {
+        src: ['js/src/app.js', 'js/src/ca.js', 'js/src/renderer.js'],
+        dest: 'js/dist/<%= meta.dist.outfile %>.js',
       },
-      dist: {
-        src: ['js/dist/<%= meta.dist.dirname %>/<%= meta.dist.outfile %>.js'],
-        dest: []
-      }
     },
 
-    bytesize: {
+    uglify: {
       dist: {
-        src: ['js/dist/<%= meta.dist.dirname %>/<%= meta.dist.outfile %>*.js']
+        files: {
+          'js/dist/<%= meta.dist.outfile %>.js': ['js/dist/<%= meta.dist.outfile %>.js']
+        }
       }
     },
 
@@ -93,10 +54,10 @@ module.exports = function(grunt) {
   });
 
   // Load plugins.
-  grunt.loadNpmTasks('grunt-bytesize');
+  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-requirejs');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-hashres');
 
@@ -107,13 +68,11 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('build', [
-    'requirejs',
+    'concat',
   ]);
 
   grunt.registerTask('post-build', [
-    'clean:after',
-    'hashres',
-    'bytesize'
+    'uglify'
   ]);
 
   grunt.registerTask('do-build', [

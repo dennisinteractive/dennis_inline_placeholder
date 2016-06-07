@@ -1,2 +1,2 @@
-# dennis_dfp_inline
+# dennis_inline_placeholder
 Automated inline DFP ads

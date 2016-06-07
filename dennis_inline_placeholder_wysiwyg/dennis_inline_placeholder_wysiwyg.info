@@ -1,0 +1,6 @@
+name = Dennis Inline Placeholder WYSIWYG
+description = WYSIWYG support for inline placeholders
+core = 7.x
+
+dependencies[] = dennis_inline_placeholder
+dependencies[] = dennis_wysiwyg
