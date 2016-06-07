@@ -1,4 +1,4 @@
-name = Dennis Placeholder
+name = Dennis Inline Placeholder
 description = Injects placeholders into the body of a node.
 core = 7.x
 

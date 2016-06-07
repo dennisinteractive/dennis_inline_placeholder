@@ -1,6 +1,6 @@
 {
-  "name": "dennis-dfp-inline",
-  "description": "Inline ad placements for Dennis Distro",
+  "name": "dennis-inline-placeholder",
+  "description": "Inline placements for Dennis Distro",
   "version": "0.0.0",
   "private": true,
   "ignore": [

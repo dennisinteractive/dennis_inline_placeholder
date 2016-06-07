@@ -7,7 +7,7 @@
 /**
  * Expose Dennis Inline Placeholder as context reactions.
  */
-class dennis_dfp_inline_context_reaction_add extends context_reaction {
+class dennis_inline_placeholder_context_reaction_add extends context_reaction {
   public $placeholder_config = [];
 
   /**
