@@ -5,7 +5,7 @@
  */
 
 /**
- * Expose DFP Inline Tags as context reactions.
+ * Expose Dennis Inline Placeholder as context reactions.
  */
 class dennis_dfp_inline_context_reaction_add extends context_reaction {
   public $placeholder_config = [];
@@ -135,10 +135,10 @@ class dennis_dfp_inline_context_reaction_add extends context_reaction {
   function execute() {
     $i = 0;
     foreach ($this->get_contexts() as $context) {
-      if (!isset($context->reactions['dennis_dfp_inline'])) {
+      if (!isset($context->reactions['dennis_inline_placeholder'])) {
         continue;
       }
-      foreach ($context->reactions['dennis_dfp_inline'] as $values) {
+      foreach ($context->reactions['dennis_inline_placeholder'] as $values) {
         if (!empty($values)) {
           $this->placeholder_config[$i] = $values;
         }

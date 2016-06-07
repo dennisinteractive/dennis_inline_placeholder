@@ -21,9 +21,9 @@ function dennis_dfp_inline_theme() {
 function dennis_dfp_inline_context_registry() {
   return array(
     'reactions' => array(
-      'dennis_dfp_inline' => array(
-        'title' => t('DFP Inline Tag'),
-        'plugin' => 'dennis_dfp_inline',
+      'dennis_inline_placeholder' => array(
+        'title' => t('Dennis Inline Placeholder'),
+        'plugin' => 'dennis_inline_placeholder',
       ),
     ),
   );
@@ -34,7 +34,7 @@ function dennis_dfp_inline_context_registry() {
  */
 function dennis_dfp_inline_context_plugins() {
   $plugins = array();
-  $plugins['dennis_dfp_inline'] = array(
+  $plugins['dennis_inline_placeholder'] = array(
     'handler' => array(
       'path' => drupal_get_path('module', 'dennis_dfp_inline') . '/plugins',
       'file' => 'dennis_dfp_inline_context_reaction_add.inc',
@@ -50,7 +50,7 @@ function dennis_dfp_inline_get_configuration(){
   $config = array();
 
   // Execute lazyadslot plugin.
-  if ($plugin = context_get_plugin('reaction', 'dennis_dfp_inline')) {
+  if ($plugin = context_get_plugin('reaction', 'dennis_inline_placeholder')) {
     $plugin->execute();
     foreach ($plugin->placeholder_config as $values) {
       $config = $values;
