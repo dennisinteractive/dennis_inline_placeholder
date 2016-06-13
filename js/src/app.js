@@ -11,7 +11,7 @@
 
 var dennisDfpInline = dennisDfpInline || {};
 
-(function () {
+(function() {
   Drupal.behaviors.dennisDfpInline = {
     attach: function( context, settings ) {
 

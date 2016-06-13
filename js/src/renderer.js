@@ -110,7 +110,7 @@ Renderer.prototype = {
 
     for (i; i < length; i++) {
       cont = fn(collection[i], i);
-      if(cont === false) {
+      if (cont === false) {
         break; //allow early exit
       }
     }
