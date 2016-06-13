@@ -56,7 +56,7 @@ class dennis_inline_placeholder_context_reaction_add extends context_reaction {
         3 => t('fourth'),
         4 => t('fifth'),
       ),
-      '#field_prefix' => t('After  the'),
+      '#field_prefix' => t('After the'),
       '#field_suffix' => t('paragraph'),
       '#default_value' => isset($values['inline_first_position']) ? $values['inline_first_position'] : '' ,
       '#description' => t('The first ad slot should appear BEFORE the configured element. Please note that this only applies if there are no manually added placeholders in the content.'),
@@ -124,7 +124,7 @@ class dennis_inline_placeholder_context_reaction_add extends context_reaction {
       ),
       '#field_prefix' => t('Before the'),
       '#field_suffix' => t('paragraph from the end.'),
-      '#default_value' => isset($values['inline_place_lasst']) ? $values['inline_place_lasst'] : '' ,
+      '#default_value' => isset($values['inline_place_last']) ? $values['inline_place_last'] : '' ,
       '#description' => t('Place last ad before the following paragraph.'),
     );
 
