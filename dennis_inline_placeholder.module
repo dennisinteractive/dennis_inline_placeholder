@@ -3,7 +3,6 @@
  * @file
  * dennis_inline_placeholder.module
  */
-//define("dennis_inline_placeholder_PLACEHOLDER", '<div class="dfpinline-manual-placeholder"></div>');
 /**
  * Implements hook_theme().
  */
@@ -80,7 +79,6 @@ function _dennis_inline_placeholder_load_js($placeholders) {
   $config = array();
   // Add collected JS configuration.
   if (!empty($placeholders)) {
-    $config['firstPosition'] = $placeholders['inline_first_position'];
     $config['placeholder'] = $placeholders['inline_placeholder'];
     $config['firstPosition'] = $placeholders['inline_first_position'];
     $config['minDistance'] = $placeholders['inline_min_distance'];
@@ -92,11 +90,6 @@ function _dennis_inline_placeholder_load_js($placeholders) {
 
     // context settings now accessible from Drupal.settings.inlineBodyPlaceholder.placeholders
     drupal_add_js(array('dennisDfpInline' => array('config' => $config)), 'setting');
-
-//  if (module_exists('dennis_inline_placeholder_wysiwyg')) {
-//    $inline_placeholder = variable_get('dennis_inline_placeholder_placeholder', dennis_inline_placeholder_PLACEHOLDER);
-//    drupal_add_js(array('dennisDfpInline' => array('wysiwyg' => $inline_placeholder)), 'setting');
-//  }
 
   }
 
