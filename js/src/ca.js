@@ -169,7 +169,7 @@ ContentAnalyser.prototype = {
       return this;
     }
     var minDistance = (this.config && parseInt(this.config.minDistance)) || 2;
-    var firstPosition = ((this.config && parseInt(this.config.firstPosition)) || 1) - 1;
+    var firstPosition = ( (this.config && parseInt( this.config.firstPosition ) ) );
     var pos = 0;
     var method;
     var last = false;
