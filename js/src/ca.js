@@ -1,13 +1,13 @@
 /**
  * Content analyser module
  *
- * @module dfpinline/ca
+ * @module inlinePlaceholder/ca
  *
  * Creates a ContentAnalyser
  *
  * @constructor
  * @alias
- *   module:dfpinline/ca
+ *   module:inlinePlaceholder/ca
  * @class
  *   Class which analyses content and generates placement mappings.
  *
@@ -60,49 +60,6 @@ function ContentAnalyser(el, settings) {
 ContentAnalyser.prototype = {
 
   /**
-   * Search the content for editorially placed placeholders in the content.
-   * Replaces them with a different one  so they are ignored when placing the automatic ones.
-   * It can later be replaced with actual ad slots.
-   *
-   * @return {Object}
-   *   The instantiated object.
-   */
-  processPlaceholders: function() {
-
-    // we'll target the manually placed placeholders
-    // replacing them temporally by dfpinline-manual-placeholder class
-    // to replace them again with the final customized in context placeholder.
-    var manualPlaceholder = new RegExp('<div class="dfpinline-auto-placeholder"></div>', 'g');
-    var match = this.content.match(manualPlaceholder);
-
-    this.utilseach(match || [], (function(match, key) {
-      if (this.tagsLeftCount > 0) {
-        // Convert the current match to a pattern.
-        var re = new RegExp(match);
-        // Generate placeholder elements to replace of the HTML comment.
-        var skel = document.createElement('span');
-        var el = document.createElement('span');
-
-        el.id = 'dfpinline-placeholder-' + key;
-        el.className = 'dfpinline-manual-placeholder';
-        skel.appendChild(el);
-
-        // Replace the match with the placeholder element.
-        this.content = this.content.replace(re, skel.innerHTML);
-        this.placeholderTags++;
-        this.tagsLeftCount--;
-      }
-    }).bind(this)); // Function.prototype.bind to keep context.
-
-    // Update the document fragment to keep up with changes so far.
-    if (this.placeholderTags > 0) {
-      this.updateFragment();
-    }
-
-    return this;
-  },
-
-  /**
    * Update the document fragment from the content string.
    *
    * Please note that this is currently done via jQuery .html() method.
@@ -146,7 +103,7 @@ ContentAnalyser.prototype = {
     if (this.placeholderTags > 0) {
       // we select all the manual placeholders, with their temporary state to identify
       // and replace with the context generated placeholder.
-      this.utilseach(this.tree.querySelectorAll('.dfpinline-manual-placeholder'), (function(item) {
+      this.utilseach(this.tree.querySelectorAll('.inline-manual-placeholder'), (function(item) {
         this.mapping.push([item, 'replaceWith', this.pattern]);
       }).bind(this)); // Function.prototype.bind to keep context.
     }
@@ -164,72 +121,92 @@ ContentAnalyser.prototype = {
    * too short paragraphs.
    */
   generateAutomatedMapping: function() {
-    // We grab all paragraphs (p tags).
+
     if (this.tagsLeftCount < 1) {
       return this;
     }
-    var minDistance = ( this.config && parseInt( this.config.minDistance ) ) || 2;
-    var firstPosition = ( (this.config && parseInt( this.config.firstPosition ) ) );
-    var pos = 0;
-    var method;
-    var last = false;
-    var maxNumber = this.tags;
-    var minWordCount = parseInt(this.config.minimum.inline_total_words);
-    var minWordCountAdNumber = parseInt(this.config.minimum.inline_max_num_if_words);
-    var lastAdPosition = parseInt(this.config.lastAdPosition);
-    //We want to count the amount of words in an article.
-    var wordCount = 0;
 
+    // TODO - The placeholder that comes in from config, doesn't actually match what is on the page
+    // When it does this can be used to match any given placeholder
     // We select all <p> tags inside this.tree and create an array of them.
     var pTags = [];
 
     [].slice.call(this.tree.childNodes[0].childNodes).forEach(function(node) {
-      if (node.nodeName === 'P') {
+      if (node.nodeName === 'P' && node.textContent) {
+        pTags.push(node);
+      } else if (node.className && node.className.search('inline') > -1 && node.className.search('placeholder') > -1) {
+        pTags = [];
         pTags.push(node);
       }
     });
 
-    // Then we clean out the empty ones (if they have html but no text).
-    pTags = this.removeEmptyParagraphs(pTags);
+    // Set all variables and logic together
+    var minDistance    = (this.config && this.config.minDistance) ? parseInt(this.config.minDistance, 10) : 2;
+    var firstPosition  = (this.config && this.config.firstPosition) ? parseInt(this.config.firstPosition, 10) : 2;
+    var lastAdPosition = (this.config && this.config.lastAdPositionEnabled === 1) ? pTags.length - parseInt(this.config.lastAdPosition, 10) : null;
+    var maxNumber      = (this.config && this.config.maxNumber) ? parseInt(this.config.maxNumber, 10) : null;
 
-    for (var j = 0; j < pTags.length; j++) {
-      wordCount += pTags[j].innerText.split(' ').length;
-    }
-    // Requirement: if less than minWordCount words only show minWordCountAdNumber ads.
-    if (wordCount < minWordCount) {
-      maxNumber = minWordCountAdNumber;
+    // Check if there is a minimum amount of words set
+    if (this.config.minimum && this.config.minimum.inline_total_words) {
+      var wordCount = 0;
+
+      for (var j = 0; j < pTags.length; j++) {
+        wordCount += pTags[j].innerText.split(' ').length;
+      }
+
+      // Requirement: if less than minWordCount words only show minWordCountAdNumber ads.
+      if (wordCount && (wordCount > parseInt(this.config.minimum.inline_total_words, 10))) {
+        maxNumber = parseInt(this.config.minimum.inline_max_num_if_words, 10);
+      }
+      
     }
 
-    // If we have manual placeholders we'll move the next ones forward.
-    // Ex: If we have 1 manual placeholder, the automatic will ignore the 1st automatic.
+    if (lastAdPosition) { maxNumber--; }
 
-    if (this.placeholderTags > 0) {
-      firstPosition = firstPosition + (this.placeholderTags * minDistance);
-    }
-    console.log(Drupal.settings.dennisDfpInline);
-    // We loop as many times as max tags per page.
-    for (var index = 0; index < this.tagsLeftCount; index++) {
-      // Insert method. After the selected paragraph.
-      method = 'after';
-      if (index === 0) {
-        pos = firstPosition;
-      } else {
-        pos = pos + minDistance;
+    var lastAdPlacement = 0;
+    var numAdsPlaced    = 0;
+
+    // Loop through our pTags array and place our adverts
+    pTags.forEach(function(tag, index) {
+      var last = false;
+      var method = 'after';
+      var placeAd = false;
+
+      // First advert
+      if (index === firstPosition) {
+        placeAd = true;
       }
-      // Place last ad before the lastAdPosition paragraph if that option is enabled.
-      if (this.config.lastAdPositionEnabled === 1 && index === (this.tagsLeftCount - 1)) {
-        pos = pTags.length - lastAdPosition;
-        method = 'before';
-        last = true;
+
+      // Min Distance between adverts
+      if ((lastAdPlacement + minDistance) === index) {
+        placeAd = true;
       }
-      // If we get to the end of the article don't add more even if we didn't reach the maximum of ads set.
-      if (pos > pTags.length - 1) {
-        last = true;
-        continue;
+
+      // Don't exceed maxNumber of ads
+      if (maxNumber && (numAdsPlaced >= maxNumber)) {
+        placeAd = false;
       }
-      console.log('method', method);
-      this.mapping.push([pTags[pos], method, last]);
-    }
+
+      // If last ad rule is set
+      if (lastAdPosition) {
+        if (index === lastAdPosition) {
+          method = 'before';
+          placeAd = true;
+        }
+
+        if (index > lastAdPosition) {
+          placeAd = false;
+        }
+      } 
+
+      // If any of the criterias are met by the time we get here push them to the DOM
+      if (placeAd === true) {
+        lastAdPlacement = index;
+        numAdsPlaced++;
+        this.mapping.push([tag, method, last]);
+      }
+    }.bind(this)); // bind.this to keep context
+
     return this;
   },
 
