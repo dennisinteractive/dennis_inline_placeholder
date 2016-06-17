@@ -201,6 +201,10 @@ ContentAnalyser.prototype = {
 
       // If any of the criterias are met by the time we get here push them to the DOM
       if (placeAd === true) {
+        // Remove side by side ads by removing the first appearing ad
+        if (lastAdPlacement === (index - 1)) {
+          this.mapping.pop();
+        }
         lastAdPlacement = index;
         numAdsPlaced++;
         this.mapping.push([tag, method, last]);
