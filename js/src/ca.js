@@ -155,7 +155,7 @@ ContentAnalyser.prototype = {
       }
 
       // Requirement: if less than minWordCount words only show minWordCountAdNumber ads.
-      if (wordCount && (wordCount > parseInt(this.config.minimum.inline_total_words, 10))) {
+      if (wordCount && (wordCount < parseInt(this.config.minimum.inline_total_words, 10))) {
         maxNumber = parseInt(this.config.minimum.inline_max_num_if_words, 10);
       }
       
