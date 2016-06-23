@@ -8,17 +8,6 @@
  * Implements hook_uninstall().
  */
 function dennis_inline_placeholder_uninstall() {
-	// Original module name
-	// Delete variables.
-	variable_del('dennis_dfp_inline_selector');
-	variable_del('dennis_dfp_inline_placeholder');
-	variable_del('dennis_dfp_inline_first_position');
-	variable_del('dennis_dfp_inline_min_distance');
-	// variable_del('dennis_dfp_inline_paragraph_length');
-	variable_del('dennis_dfp_inline_max_number');
-	variable_del('dennis_dfp_inline_paragraph');
-
-	// New module name
 	// Delete variables.
 	variable_del('dennis_inline_placeholder_selector');
 	variable_del('dennis_inline_placeholder_placeholder');
