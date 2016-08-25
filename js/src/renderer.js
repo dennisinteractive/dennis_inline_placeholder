@@ -51,6 +51,7 @@ Renderer.prototype = {
     var ca = this.analyser;
     var target, method, tag, last;
 
+    var pTags = ca.element.querySelectorAll('p');
     // Iterate over the array containing the mapping for all ad tags to be
     // inserted and generate the elements for the DFP ads in the document
     // fragment.
@@ -71,12 +72,15 @@ Renderer.prototype = {
       }
 
       // Add the final ad slot wrapper to the document fragment.
-      jQuery(target, tree)[method](adSelector);
+      //jQuery(target, tree)[method](adSelector);
       this.adsReady.push('dfp-ad-');
-    }).bind(this)); // Function.prototype.bind to keep context.
 
-    // Finally replace the original field contents with the new contents.
-    ca.element.parentNode.replaceChild(ca.tree, ca.element);
+      pTags.forEach(function(p) {
+        if (p.outerHTML === target.outerHTML) {
+          jQuery(p)[method](adSelector);
+        }
+      });
+    }).bind(this)); // Function.prototype.bind to keep context.
 
     return this;
   },
