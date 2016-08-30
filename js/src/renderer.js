@@ -51,7 +51,7 @@ Renderer.prototype = {
     var ca = this.analyser;
     var target, method, tag, last;
 
-    var pTags = ca.element.querySelectorAll('p');
+    var pTags = [].slice.call(ca.element.querySelectorAll('p'));
     // Iterate over the array containing the mapping for all ad tags to be
     // inserted and generate the elements for the DFP ads in the document
     // fragment.
