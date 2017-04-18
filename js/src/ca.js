@@ -224,7 +224,8 @@ ContentAnalyser.prototype = {
         last = true;
       }
       // If we get to the end of the article don't add more even if we didn't reach the maximum of ads set.
-      if (pos > pTags.length - 1) {
+      // Update: Must be 3 or more paragraphs after last  Ad
+      if (pos > pTags.length - 4) {
         last = true;
         continue;
       }
