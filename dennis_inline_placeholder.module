@@ -62,6 +62,10 @@ function dennis_inline_placeholder_get_configuration(){
 }
 
 function dennis_inline_placeholder_page_build(){
+  if (path_is_admin(current_path())) {
+    return;
+  }
+
   // Get configuration from context
   $config = dennis_inline_placeholder_get_configuration();
   // Pass configuration to js
